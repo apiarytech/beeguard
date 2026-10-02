@@ -1,0 +1,57 @@
+{
+  "alarms": [
+    {
+      "id": "Guard1.TempHigh",
+      "description": "Guard 1 brood temperature high",
+      "source": "Guard1.Temp",
+      "kind": "high",
+      "limit": 38,
+      "deadband": 0.5,
+      "onDelay": "3s",
+      "offDelay": "3s",
+      "severity": 700,
+      "maxShelve": "8h"
+    },
+    {
+      "id": "Guard1.TempLow",
+      "description": "Guard 1 brood temperature low",
+      "source": "Guard1.Temp",
+      "kind": "low",
+      "limit": 32,
+      "deadband": 0.5,
+      "onDelay": "3s",
+      "offDelay": "3s",
+      "severity": 600,
+      "maxShelve": "8h"
+    },
+    {
+      "id": "Guard1.Swarm",
+      "description": "Guard 1 weight falling fast: possible swarm",
+      "source": "Guard1.Weight",
+      "kind": "rate-of-fall",
+      "limit": 0.2,
+      "period": "2s",
+      "severity": 900,
+      "latched": true
+    },
+    {
+      "id": "Guard1.LidOpen",
+      "description": "Guard 1 lid open",
+      "source": "Guard1.Lid",
+      "kind": "digital",
+      "onDelay": "2s",
+      "severity": 400,
+      "maxShelve": "1h",
+      "chatterCount": 3,
+      "chatterWindow": "5m"
+    },
+    {
+      "id": "Guard1.CommFail",
+      "description": "Guard 1 sensor communication failed",
+      "source": "Guard1.Temp",
+      "kind": "bad-quality",
+      "onDelay": "5s",
+      "severity": 800
+    }
+  ]
+}

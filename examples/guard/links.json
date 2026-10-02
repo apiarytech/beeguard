@@ -1,0 +1,11 @@
+{
+  "databases": [
+    {
+      "id": "field1",
+      "url": "https://127.0.0.1:9443",
+      "tokenEnv": "FIELD_TOKEN",
+      "caFile": "examples/guard/dev/cert.pem",
+      "tags": ["Guard1.Temp", "Guard1.Weight", "Guard1.Humidity", "Guard1.Lid"]
+    }
+  ]
+}

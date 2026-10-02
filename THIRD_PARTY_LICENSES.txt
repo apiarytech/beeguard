@@ -1,0 +1,59 @@
+========================================================================
+THIRD-PARTY SOFTWARE NOTICES AND ACKNOWLEDGMENTS
+========================================================================
+
+github.com/apiarytech/beeguard uses the software components below. The required notices and
+licenses for these components are reproduced here. Each component
+remains under its own license.
+
+Generated 2026-10-01 by scripts/gen-third-party-licenses.sh
+from the modules linked into github.com/apiarytech/beeguard. See also NOTICE.md.
+
+------------------------------------------------------------------------
+1. Component Name: github.com/apiarytech/honeycomb
+   Version: development checkout (147d420, 2026-10-01)
+   Project URL: https://github.com/apiarytech/honeycomb
+   License Type: Dual license: GPLv3, or commercial
+------------------------------------------------------------------------
+# Dual Licensing
+
+This project, honeycomb, is dual-licensed. You may use it under the terms of either the GNU General Public License version 3 (GPLv3) or a commercial license.
+
+## GPLv3
+
+This project, honeycomb, can be used under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version. The full text of the GPLv3 is available in the `gpl-3.0.md` file.
+
+This is a good choice if you are developing open source software and want to share your work with the community. GPLv3 is compatible with Apache License 2.0 dependencies such as Apache PLC4X.
+
+## Commercial License
+
+If you wish to use this software, honeycomb, in a proprietary application or otherwise do not wish to be bound by the terms of the GPLv3, you must purchase a commercial license. Please contact the author for more information on obtaining a commercial license.
+
+
+The full GPL text is in the gpl-*.md file of the github.com/apiarytech/honeycomb repository.
+
+------------------------------------------------------------------------
+2. Component Name: github.com/apiarytech/royaljelly
+   Version: v0.1.0-beta1
+   Project URL: https://github.com/apiarytech/royaljelly
+   License Type: Dual license: GPLv2 or later, or commercial
+------------------------------------------------------------------------
+# Dual Licensing
+
+This project, royaljelly, is dual-licensed. You may use it under the terms of either the GNU General Public License version 2 (GPLv2) or a commercial license.
+
+## GPLv2
+
+This project, royaljelly, can be used under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version. The full text of the GPLv2 is available in the `gpl-2.0.md` file.
+
+This is a good choice if you are developing open source software and want to share your work with the community.
+
+## Commercial License
+
+If you wish to use this software, royaljelly, in a proprietary application or otherwise do not wish to be bound by the terms of the GPLv2, you must purchase a commercial license. Please contact the author for more information on obtaining a commercial license.
+
+The full GPL text is in the gpl-*.md file of the github.com/apiarytech/royaljelly repository.
+
+========================================================================
+END OF THIRD-PARTY SOFTWARE NOTICES
+========================================================================

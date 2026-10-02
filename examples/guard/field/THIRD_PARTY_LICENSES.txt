@@ -1,0 +1,602 @@
+========================================================================
+THIRD-PARTY SOFTWARE NOTICES AND ACKNOWLEDGMENTS
+========================================================================
+
+github.com/apiarytech/beeguard/examples/guard/field uses the software components below. The required notices and
+licenses for these components are reproduced here. Each component
+remains under its own license.
+
+Generated 2026-10-01 by scripts/gen-third-party-licenses.sh
+from the modules linked into github.com/apiarytech/beeguard/examples/guard/field. See also NOTICE.md.
+
+------------------------------------------------------------------------
+1. Component Name: github.com/apache/plc4x/plc4go
+   Version: v0.0.0-20260930074747-b878affa2d7b
+   Project URL: https://github.com/apache/plc4x (plc4go)
+   License Type: Apache License 2.0
+------------------------------------------------------------------------
+
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      "Licensor" shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      "Legal Entity" shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      "control" means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      "You" (or "Your") shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      "Source" form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      "Object" form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      "Work" shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      "Derivative Works" shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      "Contribution" shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, "submitted"
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as "Not a Contribution."
+
+      "Contributor" shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a "NOTICE" text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright [yyyy] [name of copyright owner]
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       https://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+===============================================================
+
+The files:
+plc4go/spi/transports/serial/serialport/apply_linux.go
+plc4go/spi/transports/serial/serialport/apply_darwin.go
+Contain logic derived from github.com/jacobsa/go-serial, copyrighted by Aaron Jacobs,
+which is distributed under the Apache 2.0 license.
+
+The file:
+code-generation/protocol-base-mspec/src/main/antlr4/org/apache/plc4x/plugins/codegenerator/language/mspec/expression/Expression.g4
+is licensed under the Category A: "UNLICENSE" which is available here:
+UNLICENSE file in the licenses directory.
+
+
+
+------------------------------------------------------------------------
+2. Component Name: github.com/apiarytech/beeguard
+   Version: development checkout (local)
+   Project URL: https://github.com/apiarytech/beeguard
+   License Type: Dual license: GPLv3, or commercial
+------------------------------------------------------------------------
+[LICENSE.md]
+
+# Dual Licensing
+
+This project, beeguard, is dual-licensed. You may use it under the terms of either the GNU General Public License version 3 (GPLv3) or a commercial license.
+
+## GPLv3
+
+This project, beeguard, can be used under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version. The full text of the GPLv3 is available in the `gpl-3.0.md` file.
+
+This is a good choice if you are developing open source software and want to share your work with the community. GPLv3 is compatible with Apache License 2.0 dependencies such as Apache PLC4X.
+
+## Commercial License
+
+If you wish to use this software, beeguard, in a proprietary application or otherwise do not wish to be bound by the terms of the GPLv3, you must purchase a commercial license. Please contact the author for more information on obtaining a commercial license.
+
+## Third-party components
+
+beeguard uses third-party software under its own licenses. These licenses, the standards it refers to, and trademark notices are listed in `NOTICE.md`, and their full license texts are in `THIRD_PARTY_LICENSES.txt`.
+
+[NOTICE.md]
+
+# Notices
+
+beeguard
+Copyright (C) 2026 Franklin D. Amador
+
+beeguard is dual-licensed under the GNU General Public License version 3 or a
+commercial license; see [LICENSE.md](LICENSE.md) and [gpl-3.0.md](gpl-3.0.md).
+
+## Third-party software
+
+beeguard is built with the software below. Each component remains under its
+own license, and its copyright notice and license text must accompany any
+distribution of beeguard in source or binary form. The full license texts are
+reproduced in [THIRD_PARTY_LICENSES.txt](THIRD_PARTY_LICENSES.txt); they also come from
+each module's source (for example in the Go module cache under the path and
+version listed).
+
+| Component | Version | License |
+|---|---|---|
+| github.com/apiarytech/honeycomb (and connectors/plc4x) | development checkout | GPLv3 or commercial (same author) |
+| github.com/apiarytech/royaljelly | v0.1.0-beta1 | GPLv2 or later, or commercial (same author) |
+| github.com/apache/plc4x/plc4go | v0.0.0-20260930074747-b878affa2d7b | Apache License 2.0 |
+| charm.land/log/v2 | v2.0.0 | MIT |
+| charm.land/lipgloss/v2 | v2.0.4 | MIT |
+| github.com/charmbracelet/colorprofile | v0.4.3 | MIT |
+| github.com/charmbracelet/ultraviolet | v0.0.0-20260703014108-f5a850f9c2b7 | MIT |
+| github.com/charmbracelet/x/ansi, x/term, x/windows | v0.11.7, v0.2.2, v0.2.2 | MIT |
+| github.com/clipperhouse/displaywidth | v0.11.0 | MIT |
+| github.com/clipperhouse/uax29/v2 | v2.7.0 | MIT |
+| github.com/dustin/go-humanize | v1.0.1 | MIT |
+| github.com/fatih/color | v1.19.0 | MIT |
+| github.com/go-logfmt/logfmt | v0.6.0 | MIT |
+| github.com/lucasb-eyer/go-colorful | v1.4.0 | MIT |
+| github.com/mattn/go-colorable | v0.1.15 | MIT |
+| github.com/mattn/go-isatty | v0.0.24 | MIT |
+| github.com/mattn/go-runewidth | v0.0.24 | MIT |
+| github.com/muesli/cancelreader | v0.2.2 | MIT |
+| github.com/ncruces/go-strftime | v1.0.0 | MIT |
+| github.com/rivo/uniseg | v0.4.7 | MIT |
+| github.com/rs/zerolog | v1.35.1 | MIT |
+| github.com/xo/terminfo | v0.0.0-20220910002029-abceb7e1c41e | MIT |
+| github.com/remyoudompheng/bigfft | v0.0.0-20230129092748-24d4a6f8daec | BSD 3-Clause |
+| golang.org/x/sync, x/sys, x/text | v0.23.0, v0.48.0, v0.42.0 | BSD 3-Clause |
+| modernc.org/sqlite | v1.60.1 | BSD 3-Clause (embeds SQLite, public domain) |
+| modernc.org/libc, mathutil, memory | v1.77.1, v1.7.1, v1.12.1 | BSD 3-Clause |
+
+This list covers the modules linked into `cmd/beeguard` and `cmd/modbus_sim`
+as of 2026-10-01. When dependencies change, regenerate THIRD_PARTY_LICENSES.txt
+with `scripts/gen-third-party-licenses.sh` and update this table; the module list is:
+
+```bash
+go list -deps -f '{{if .Module}}{{.Module.Path}}@{{.Module.Version}}{{end}}' ./... | sort -u
+```
+
+### Apache PLC4X
+
+This product includes software developed at The Apache Software Foundation
+(https://www.apache.org/): Apache PLC4X (plc4go), licensed under the Apache
+License, Version 2.0.
+
+## Standards and other references
+
+beeguard implements concepts described in published industry standards and
+guidance. No text, tables or figures from these documents are reproduced;
+they are cited by name only.
+
+- ANSI/ISA-18.2, *Management of Alarm Systems for the Process Industries*, and
+  the technical reports ISA-TR18.2.x, International Society of Automation.
+- IEC 62682, *Management of alarm systems for the process industries*,
+  International Electrotechnical Commission.
+- EEMUA Publication 191, *Alarm systems: a guide to design, management and
+  procurement*, Engineering Equipment and Materials Users Association.
+- IEC 61131-3, *Programmable controllers – Programming languages*.
+
+See [doc/decisions.md](doc/decisions.md#sources-and-originality) for how these
+and publicly available vendor documentation were used.
+
+## Trademarks
+
+ISA is a trademark of the International Society of Automation. IEC is a
+trademark of the International Electrotechnical Commission. EEMUA is a
+trademark of the Engineering Equipment and Materials Users Association.
+Rockwell Automation, Logix, Studio 5000 and FactoryTalk are trademarks of
+Rockwell Automation, Inc. Modbus is a trademark of Schneider Electric USA,
+Inc. (administered by the Modbus Organization). Apache and PLC4X are
+trademarks of The Apache Software Foundation. CODESYS is a trademark of
+CODESYS GmbH. All other trademarks are the property of their respective
+owners. Their use in this project is for identification and reference only
+and does not imply endorsement by, or affiliation with, their owners.
+beeguard is not affiliated with or endorsed by any of the organizations
+named above.
+
+
+The full GPL text is in the gpl-*.md file of the github.com/apiarytech/beeguard repository.
+
+------------------------------------------------------------------------
+3. Component Name: github.com/apiarytech/honeycomb
+   Version: development checkout (147d420, 2026-10-01)
+   Project URL: https://github.com/apiarytech/honeycomb
+   License Type: Dual license: GPLv3, or commercial
+------------------------------------------------------------------------
+# Dual Licensing
+
+This project, honeycomb, is dual-licensed. You may use it under the terms of either the GNU General Public License version 3 (GPLv3) or a commercial license.
+
+## GPLv3
+
+This project, honeycomb, can be used under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version. The full text of the GPLv3 is available in the `gpl-3.0.md` file.
+
+This is a good choice if you are developing open source software and want to share your work with the community. GPLv3 is compatible with Apache License 2.0 dependencies such as Apache PLC4X.
+
+## Commercial License
+
+If you wish to use this software, honeycomb, in a proprietary application or otherwise do not wish to be bound by the terms of the GPLv3, you must purchase a commercial license. Please contact the author for more information on obtaining a commercial license.
+
+
+The full GPL text is in the gpl-*.md file of the github.com/apiarytech/honeycomb repository.
+
+------------------------------------------------------------------------
+4. Component Name: github.com/apiarytech/honeycomb/connectors/plc4x
+   Version: development checkout (147d420, 2026-10-01)
+   Project URL: https://github.com/apiarytech/honeycomb (connectors/plc4x)
+   License Type: Dual license: GPLv3, or commercial
+------------------------------------------------------------------------
+# Dual Licensing
+
+This project, honeycomb, is dual-licensed. You may use it under the terms of either the GNU General Public License version 3 (GPLv3) or a commercial license.
+
+## GPLv3
+
+This project, honeycomb, can be used under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version. The full text of the GPLv3 is available in the `gpl-3.0.md` file.
+
+This is a good choice if you are developing open source software and want to share your work with the community. GPLv3 is compatible with Apache License 2.0 dependencies such as Apache PLC4X.
+
+## Commercial License
+
+If you wish to use this software, honeycomb, in a proprietary application or otherwise do not wish to be bound by the terms of the GPLv3, you must purchase a commercial license. Please contact the author for more information on obtaining a commercial license.
+
+
+The full GPL text is in the gpl-*.md file of the github.com/apiarytech/honeycomb/connectors/plc4x repository.
+
+------------------------------------------------------------------------
+5. Component Name: github.com/apiarytech/royaljelly
+   Version: v0.1.0-beta1
+   Project URL: https://github.com/apiarytech/royaljelly
+   License Type: Dual license: GPLv2 or later, or commercial
+------------------------------------------------------------------------
+# Dual Licensing
+
+This project, royaljelly, is dual-licensed. You may use it under the terms of either the GNU General Public License version 2 (GPLv2) or a commercial license.
+
+## GPLv2
+
+This project, royaljelly, can be used under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version. The full text of the GPLv2 is available in the `gpl-2.0.md` file.
+
+This is a good choice if you are developing open source software and want to share your work with the community.
+
+## Commercial License
+
+If you wish to use this software, royaljelly, in a proprietary application or otherwise do not wish to be bound by the terms of the GPLv2, you must purchase a commercial license. Please contact the author for more information on obtaining a commercial license.
+
+The full GPL text is in the gpl-*.md file of the github.com/apiarytech/royaljelly repository.
+
+------------------------------------------------------------------------
+6. Component Name: github.com/fatih/color
+   Version: v1.19.0
+   Project URL: https://github.com/fatih/color
+   License Type: MIT License
+------------------------------------------------------------------------
+The MIT License (MIT)
+
+Copyright (c) 2013 Fatih Arslan
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+------------------------------------------------------------------------
+7. Component Name: github.com/mattn/go-colorable
+   Version: v0.1.15
+   Project URL: https://github.com/mattn/go-colorable
+   License Type: MIT License
+------------------------------------------------------------------------
+The MIT License (MIT)
+
+Copyright (c) 2016 Yasuhiro Matsumoto
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+------------------------------------------------------------------------
+8. Component Name: github.com/mattn/go-isatty
+   Version: v0.0.24
+   Project URL: https://github.com/mattn/go-isatty
+   License Type: MIT License
+------------------------------------------------------------------------
+Copyright (c) Yasuhiro MATSUMOTO <mattn.jp@gmail.com>
+
+MIT License (Expat)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+------------------------------------------------------------------------
+9. Component Name: github.com/rs/zerolog
+   Version: v1.35.1
+   Project URL: https://github.com/rs/zerolog
+   License Type: MIT License
+------------------------------------------------------------------------
+MIT License
+
+Copyright (c) 2017 Olivier Poitrey
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+------------------------------------------------------------------------
+10. Component Name: golang.org/x/sys
+   Version: v0.48.0
+   Project URL: https://go.googlesource.com/sys
+   License Type: BSD 3-Clause License
+------------------------------------------------------------------------
+Copyright 2009 The Go Authors.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google LLC nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+------------------------------------------------------------------------
+11. Component Name: golang.org/x/text
+   Version: v0.42.0
+   Project URL: https://go.googlesource.com/text
+   License Type: BSD 3-Clause License
+------------------------------------------------------------------------
+Copyright 2009 The Go Authors.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google LLC nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+========================================================================
+END OF THIRD-PARTY SOFTWARE NOTICES
+========================================================================

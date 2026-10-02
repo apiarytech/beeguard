@@ -1,0 +1,16 @@
+{
+  "diagnostics": "PLC4X.",
+  "connections": [
+    {
+      "name": "guard1",
+      "url": "modbus-tcp://127.0.0.1:5020",
+      "interval": "500ms",
+      "bindings": [
+        {"tag": "Guard1.Temp", "address": "holding-register:1:REAL"},
+        {"tag": "Guard1.Weight", "address": "holding-register:3:REAL"},
+        {"tag": "Guard1.Humidity", "address": "holding-register:5:REAL"},
+        {"tag": "Guard1.Lid", "address": "coil:1:BOOL"}
+      ]
+    }
+  ]
+}
