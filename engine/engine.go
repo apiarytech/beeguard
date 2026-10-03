@@ -394,3 +394,38 @@ func (e *Engine) flush() {
 		}
 	}
 }
+
+// Snapshot returns every alarm's state by alarm ID, to keep it across a
+// restart (see Restore).
+func (e *Engine) Snapshot() map[string]alarm.Snapshot {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	out := make(map[string]alarm.Snapshot, len(e.order))
+	for _, en := range e.order {
+		out[en.alarm.Config().ID] = en.alarm.Snapshot()
+	}
+	return out
+}
+
+// Restore gives alarms the states Snapshot saved, by alarm ID, before the
+// engine runs: acknowledgements, shelves, suppression and out-of-service
+// survive a restart, and an alarm still active stays active without a new
+// activation. States of alarms no longer defined are ignored; it returns the
+// errors of states that do not fit their alarm's definition (those alarms
+// start from normal). The evaluators start afresh: an on-delay in progress
+// starts again.
+func (e *Engine) Restore(states map[string]alarm.Snapshot) error {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	var errs []error
+	for id, s := range states {
+		en, ok := e.entries[id]
+		if !ok {
+			continue
+		}
+		if err := en.alarm.Restore(s); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	return errors.Join(errs...)
+}
