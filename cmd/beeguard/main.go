@@ -241,10 +241,16 @@ func apiServer(port, certFile, keyFile string, h http.Handler) (*http.Server, er
 		return nil, fmt.Errorf("api: %w", err)
 	}
 	return &http.Server{
-		Addr:              ":" + port,
-		Handler:           h,
-		TLSConfig:         &tls.Config{MinVersion: tls.VersionTLS12, Certificates: []tls.Certificate{pair}},
+		Addr:      ":" + port,
+		Handler:   h,
+		TLSConfig: &tls.Config{MinVersion: tls.VersionTLS12, Certificates: []tls.Certificate{pair}},
+		// Bounded like honeycomb's tag API: a slow or idle client cannot
+		// hold a connection open, nor send unbounded headers.
 		ReadHeaderTimeout: 10 * time.Second,
+		ReadTimeout:       30 * time.Second,
+		WriteTimeout:      time.Minute,
+		IdleTimeout:       2 * time.Minute,
+		MaxHeaderBytes:    32 << 10,
 	}, nil
 }
 

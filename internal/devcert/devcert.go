@@ -30,12 +30,13 @@ import (
 )
 
 // Ensure returns cert.pem and key.pem in dir, creating them if either is
-// missing. The certificate is valid for one year for localhost, 127.0.0.1,
-// ::1 and the machine's host name. Clients trust it by using cert.pem as
-// their CA file.
+// missing, the certificate is unconstrained (made by an older version) or it
+// expires within 30 days. The certificate is valid for one year for
+// localhost, 127.0.0.1, ::1 and the machine's host name, and can certify
+// nothing else. Clients trust it by using cert.pem as their CA file.
 func Ensure(dir string) (certFile, keyFile string, err error) {
 	certFile, keyFile = filepath.Join(dir, "cert.pem"), filepath.Join(dir, "key.pem")
-	if exists(certFile) && exists(keyFile) {
+	if usable(certFile) && exists(keyFile) {
 		return certFile, keyFile, nil
 	}
 	if err := os.MkdirAll(dir, 0o700); err != nil {
@@ -63,8 +64,18 @@ func Ensure(dir string) (certFile, keyFile string, err error) {
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
 		IsCA:                  true, // self-signed: it is its own CA, so clients can trust it directly
-		DNSNames:              names,
-		IPAddresses:           []net.IP{net.IPv4(127, 0, 0, 1), net.IPv6loopback},
+		// A constrained CA: it can certify only its own names and the
+		// loopback addresses, and no intermediate CA, so its key cannot
+		// vouch for any other host even if it leaks.
+		MaxPathLenZero:              true,
+		PermittedDNSDomainsCritical: true,
+		PermittedDNSDomains:         names,
+		PermittedIPRanges: []*net.IPNet{
+			{IP: net.IPv4(127, 0, 0, 1).To4(), Mask: net.CIDRMask(32, 32)},
+			{IP: net.IPv6loopback, Mask: net.CIDRMask(128, 128)},
+		},
+		DNSNames:    names,
+		IPAddresses: []net.IP{net.IPv4(127, 0, 0, 1), net.IPv6loopback},
 	}
 	der, err := x509.CreateCertificate(rand.Reader, template, template, &key.PublicKey, key)
 	if err != nil {
@@ -81,6 +92,24 @@ func Ensure(dir string) (certFile, keyFile string, err error) {
 		return "", "", err
 	}
 	return certFile, keyFile, nil
+}
+
+// usable reports whether certFile is a constrained development CA that is
+// valid for at least another 30 days.
+func usable(certFile string) bool {
+	data, err := os.ReadFile(certFile)
+	if err != nil {
+		return false
+	}
+	block, _ := pem.Decode(data)
+	if block == nil {
+		return false
+	}
+	cert, err := x509.ParseCertificate(block.Bytes)
+	if err != nil {
+		return false
+	}
+	return cert.PermittedDNSDomainsCritical && cert.MaxPathLenZero && time.Now().Add(30*24*time.Hour).Before(cert.NotAfter)
 }
 
 func exists(path string) bool {

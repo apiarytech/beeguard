@@ -36,6 +36,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"reflect"
 	"time"
 
 	"github.com/apiarytech/beeguard/alarm"
@@ -61,6 +62,14 @@ type fileAlarm struct {
 	MaxShelve     string `json:"maxShelve"`
 	ChatterCount  int    `json:"chatterCount"`
 	ChatterWindow string `json:"chatterWindow"`
+}
+
+// FileType is the Go type of an alarms file, for tools that describe the
+// form, such as a JSON Schema generator.
+func FileType() reflect.Type {
+	return reflect.TypeOf(struct {
+		Alarms []fileAlarm `json:"alarms"`
+	}{})
 }
 
 // Load reads alarm definitions from a JSON file.
