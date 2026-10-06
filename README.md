@@ -25,7 +25,9 @@ third-party modules. Design and structure are documented in [doc/](doc/README.md
   condition, and an unreachable database counts as bad quality.
 - **Priority** from a 1..1000 severity, **chattering detection**, **alarm counts**.
 - **Journal** as a JSON Lines file (default), in memory, or in SQLite with
-  `-tags sqlite`, with the device time of the value behind each event.
+  `-tags sqlite`, with the device time of the value behind each event,
+  retention by age (`"journal": {"retention": "8760h"}` in the alarms file)
+  and paging from the oldest entry, to read a whole day for a report.
 - **APIs**: a transport-neutral Go service interface ([api](api/)) ready to be
   wrapped as a microservice, served over HTTPS/JSON ([api/httpapi](api/httpapi/)).
 - **Logging** through the standard library's `log/slog`, as text or JSON.

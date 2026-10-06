@@ -15,7 +15,7 @@
 //	GET  /v1/alarms/active             alarms in alarm or waiting for ack
 //	GET  /v1/alarms/{id}               one alarm
 //	POST /v1/alarms/{id}/commands      {"command": "ack", "user": "franklin"}
-//	GET  /v1/events?alarm=&kind=&since=&until=&limit=
+//	GET  /v1/events?alarm=&kind=&since=&until=&limit=&offset=&oldest=
 //
 // "since" and "until" are RFC 3339 times; "kind" may repeat. Errors are
 // {"code": "...", "message": "..."} with the HTTP status from the api.Code.
@@ -81,9 +81,17 @@ func (h *handler) events(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	query := api.EventQuery{Alarm: q.Get("alarm"), Kinds: q["kind"]}
 	var err error
-	if v := q.Get("limit"); v != "" {
-		if query.Limit, err = strconv.Atoi(v); err != nil {
-			reply(w, nil, &api.Error{Code: api.CodeInvalid, Message: "limit: " + err.Error()})
+	for name, dst := range map[string]*int{"limit": &query.Limit, "offset": &query.Offset} {
+		if v := q.Get(name); v != "" {
+			if *dst, err = strconv.Atoi(v); err != nil {
+				reply(w, nil, &api.Error{Code: api.CodeInvalid, Message: name + ": " + err.Error()})
+				return
+			}
+		}
+	}
+	if v := q.Get("oldest"); v != "" {
+		if query.Oldest, err = strconv.ParseBool(v); err != nil {
+			reply(w, nil, &api.Error{Code: api.CodeInvalid, Message: "oldest: " + err.Error()})
 			return
 		}
 	}

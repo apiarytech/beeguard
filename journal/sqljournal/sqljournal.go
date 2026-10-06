@@ -24,6 +24,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"math"
 	"slices"
 	"strings"
 	"time"
@@ -182,16 +183,35 @@ func (j *Journal) Query(ctx context.Context, f journal.Filter) ([]alarm.Event, e
 		where = append(where, "kind IN ("+strings.Join(in, ", ")+")")
 	}
 
+	offset := max(f.Offset, 0)
 	query := "SELECT " + columns + " FROM " + Table
-	if f.Limit > 0 && j.dialect == "sqlserver" {
+	if f.Limit > 0 && offset == 0 && j.dialect == "sqlserver" {
 		query = fmt.Sprintf("SELECT TOP %d %s FROM %s", f.Limit, columns, Table)
 	}
 	if len(where) > 0 {
 		query += " WHERE " + strings.Join(where, " AND ")
 	}
-	query += " ORDER BY id DESC" // newest first, so Limit keeps the most recent
-	if f.Limit > 0 && j.dialect != "sqlserver" {
-		query += fmt.Sprintf(" LIMIT %d", f.Limit)
+	if f.Oldest {
+		query += " ORDER BY id"
+	} else {
+		query += " ORDER BY id DESC" // newest first, so Limit keeps the most recent
+	}
+	switch {
+	case j.dialect == "sqlserver" && offset > 0:
+		query += fmt.Sprintf(" OFFSET %d ROWS", offset)
+		if f.Limit > 0 {
+			query += fmt.Sprintf(" FETCH NEXT %d ROWS ONLY", f.Limit)
+		}
+	case j.dialect == "sqlserver":
+	case f.Limit > 0 || offset > 0:
+		limit := int64(f.Limit)
+		if limit <= 0 {
+			limit = math.MaxInt64 // an offset needs a limit in SQLite and MySQL
+		}
+		query += fmt.Sprintf(" LIMIT %d", limit)
+		if offset > 0 {
+			query += fmt.Sprintf(" OFFSET %d", offset)
+		}
 	}
 
 	rows, err := j.db.QueryContext(ctx, query, args...)
@@ -210,8 +230,22 @@ func (j *Journal) Query(ctx context.Context, f journal.Filter) ([]alarm.Event, e
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("sqljournal: query: %w", err)
 	}
-	slices.Reverse(out)
+	if !f.Oldest {
+		slices.Reverse(out)
+	}
 	return out, nil
+}
+
+var _ journal.Purger = (*Journal)(nil)
+
+// Purge deletes the events recorded before before.
+func (j *Journal) Purge(ctx context.Context, before time.Time) (int64, error) {
+	res, err := j.db.ExecContext(ctx, "DELETE FROM "+Table+" WHERE event_time < "+j.placeholder(1), before.UnixNano())
+	if err != nil {
+		return 0, fmt.Errorf("sqljournal: purge: %w", err)
+	}
+	n, _ := res.RowsAffected()
+	return n, nil
 }
 
 func scan(rows *sql.Rows) (alarm.Event, error) {

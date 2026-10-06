@@ -181,8 +181,56 @@ func (j *Journal) Query(_ context.Context, f journal.Filter) ([]alarm.Event, err
 			break
 		}
 	}
-	if f.Limit > 0 && len(out) > f.Limit {
-		out = out[len(out)-f.Limit:]
+	return f.Window(out), nil
+}
+
+var _ journal.Purger = (*Journal)(nil)
+
+// Purge drops the events recorded before before. It rewrites the file: the
+// events kept go to a new file beside it, which then replaces it.
+func (j *Journal) Purge(_ context.Context, before time.Time) (int64, error) {
+	j.mu.Lock()
+	defer j.mu.Unlock()
+	data, err := os.ReadFile(j.path)
+	if err != nil {
+		return 0, fmt.Errorf("filejournal: %w", err)
 	}
-	return out, nil
+	var kept bytes.Buffer
+	var n int64
+	for line := range bytes.Lines(data) {
+		var r record
+		if !bytes.HasSuffix(line, []byte("\n")) {
+			break // cut short by a crash
+		}
+		if err := json.Unmarshal(line, &r); err == nil && r.Time.Before(before) {
+			n++
+			continue
+		}
+		kept.Write(line)
+	}
+	if n == 0 {
+		return 0, nil
+	}
+	tmp := j.path + ".purge"
+	if err := os.WriteFile(tmp, kept.Bytes(), 0o640); err != nil {
+		return 0, fmt.Errorf("filejournal: purge: %w", err)
+	}
+	if f, err := os.OpenFile(tmp, os.O_WRONLY, 0); err == nil {
+		f.Sync()
+		f.Close()
+	}
+	if err := j.f.Close(); err != nil {
+		return 0, fmt.Errorf("filejournal: purge: %w", err)
+	}
+	renameErr := os.Rename(tmp, j.path)
+	f, err := os.OpenFile(j.path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o640)
+	if err != nil {
+		return 0, fmt.Errorf("filejournal: purge: reopen: %w", err)
+	}
+	j.f = f
+	if renameErr != nil {
+		os.Remove(tmp)
+		return 0, fmt.Errorf("filejournal: purge: %w", renameErr)
+	}
+	return n, nil
 }

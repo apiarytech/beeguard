@@ -115,7 +115,7 @@ func TestEvents(t *testing.T) {
 	if err := json.Unmarshal(body, &events); err != nil || status != 200 || len(events) != 1 || events[0].Kind != "ACTIVATED" {
 		t.Fatalf("events: %d %s", status, body)
 	}
-	for _, q := range []string{"limit=x", "since=yesterday", "kind=EXPLODED"} {
+	for _, q := range []string{"limit=x", "offset=-1", "oldest=maybe", "since=yesterday", "kind=EXPLODED"} {
 		if status, _ := do(t, srv, "GET", "/v1/events?"+q, "secret", ""); status != http.StatusBadRequest {
 			t.Errorf("%s: status %d", q, status)
 		}

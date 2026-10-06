@@ -29,6 +29,9 @@
 // durations ("500ms", "15s", "8h"). "severity" defaults to 500 and
 // "ackRequired" to true, the safer choice for an alarm. Unknown keys
 // are rejected, so a misspelled key fails at startup instead of being ignored.
+//
+// "journal" sets how the journal is kept: {"retention": "8760h"} deletes
+// events older than a year (ParseConfig).
 package config
 
 import (
@@ -64,47 +67,95 @@ type fileAlarm struct {
 	ChatterWindow string `json:"chatterWindow"`
 }
 
+// fileJournal is the journal's settings in an alarms file.
+type fileJournal struct {
+	// Retention: events older than this are deleted ("8760h"); empty keeps
+	// them for ever.
+	Retention string `json:"retention,omitempty"`
+}
+
+type file struct {
+	Alarms  []fileAlarm  `json:"alarms"`
+	Journal *fileJournal `json:"journal,omitempty"`
+}
+
 // FileType is the Go type of an alarms file, for tools that describe the
 // form, such as a JSON Schema generator.
-func FileType() reflect.Type {
-	return reflect.TypeOf(struct {
-		Alarms []fileAlarm `json:"alarms"`
-	}{})
+func FileType() reflect.Type { return reflect.TypeOf(file{}) }
+
+// Config is an alarms file: the definitions and the journal's settings.
+type Config struct {
+	Alarms  []engine.Definition
+	Journal Journal
+}
+
+// Journal is how the journal is kept.
+type Journal struct {
+	// Retention: events older than this are deleted, by whoever runs the
+	// journal (journal.Purger); zero keeps them for ever.
+	Retention time.Duration
+}
+
+// ParseConfig reads an alarms file: the definitions and, under "journal",
+// the journal's settings:
+//
+//	{"alarms": [...], "journal": {"retention": "8760h"}}
+func ParseConfig(r io.Reader) (Config, error) {
+	var f file
+	dec := json.NewDecoder(r)
+	dec.DisallowUnknownFields()
+	if err := dec.Decode(&f); err != nil {
+		return Config{}, err
+	}
+	var c Config
+	if f.Journal != nil && f.Journal.Retention != "" {
+		d, err := time.ParseDuration(f.Journal.Retention)
+		if err != nil || d < 0 {
+			return Config{}, fmt.Errorf("journal: retention %q: a positive duration such as \"8760h\"", f.Journal.Retention)
+		}
+		c.Journal.Retention = d
+	}
+	c.Alarms = make([]engine.Definition, 0, len(f.Alarms))
+	for _, fa := range f.Alarms {
+		def, err := fa.definition()
+		if err != nil {
+			return Config{}, fmt.Errorf("alarm %q: %w", fa.ID, err)
+		}
+		c.Alarms = append(c.Alarms, def)
+	}
+	return c, nil
 }
 
 // Load reads alarm definitions from a JSON file.
 func Load(path string) ([]engine.Definition, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, fmt.Errorf("config: %w", err)
-	}
-	defer f.Close()
-	defs, err := Parse(f)
-	if err != nil {
-		return nil, fmt.Errorf("config %s: %w", path, err)
-	}
-	return defs, nil
+	c, err := LoadConfig(path)
+	return c.Alarms, err
 }
 
-// Parse reads alarm definitions in the JSON form described in the package documentation.
-func Parse(r io.Reader) ([]engine.Definition, error) {
-	var file struct {
-		Alarms []fileAlarm `json:"alarms"`
+// LoadConfig reads an alarms file: the definitions and the journal's
+// settings.
+func LoadConfig(path string) (Config, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return Config{}, fmt.Errorf("config: %w", err)
 	}
-	dec := json.NewDecoder(r)
-	dec.DisallowUnknownFields()
-	if err := dec.Decode(&file); err != nil {
+	defer f.Close()
+	c, err := ParseConfig(f)
+	if err != nil {
+		return Config{}, fmt.Errorf("config %s: %w", path, err)
+	}
+	return c, nil
+}
+
+// Parse reads alarm definitions in the JSON form described in the package
+// documentation. The journal's settings are checked but not returned:
+// ParseConfig returns them.
+func Parse(r io.Reader) ([]engine.Definition, error) {
+	c, err := ParseConfig(r)
+	if err != nil {
 		return nil, err
 	}
-	defs := make([]engine.Definition, 0, len(file.Alarms))
-	for _, fa := range file.Alarms {
-		def, err := fa.definition()
-		if err != nil {
-			return nil, fmt.Errorf("alarm %q: %w", fa.ID, err)
-		}
-		defs = append(defs, def)
-	}
-	return defs, nil
+	return c.Alarms, nil
 }
 
 func (fa fileAlarm) definition() (engine.Definition, error) {

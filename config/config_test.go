@@ -57,10 +57,12 @@ func TestParse(t *testing.T) {
 
 func TestParseRejects(t *testing.T) {
 	for name, doc := range map[string]string{
-		"unknown key":  `{"alarms": [{"id": "A", "sourse": "S"}]}`,
-		"unknown kind": `{"alarms": [{"id": "A", "kind": "sideways"}]}`,
-		"bad duration": `{"alarms": [{"id": "A", "kind": "high", "onDelay": "soon"}]}`,
-		"not json":     `alarms:`,
+		"unknown key":   `{"alarms": [{"id": "A", "sourse": "S"}]}`,
+		"unknown kind":  `{"alarms": [{"id": "A", "kind": "sideways"}]}`,
+		"bad duration":  `{"alarms": [{"id": "A", "kind": "high", "onDelay": "soon"}]}`,
+		"not json":      `alarms:`,
+		"bad retention": `{"alarms": [], "journal": {"retention": "a year"}}`,
+		"journal key":   `{"alarms": [], "journal": {"keep": "8760h"}}`,
 	} {
 		if _, err := Parse(strings.NewReader(doc)); err == nil {
 			t.Errorf("%s: accepted", name)
@@ -79,5 +81,15 @@ func TestLoad(t *testing.T) {
 	}
 	if _, err := Load(filepath.Join(t.TempDir(), "missing.json")); err == nil {
 		t.Fatal("loaded a missing file")
+	}
+}
+
+func TestParseConfigJournal(t *testing.T) {
+	c, err := ParseConfig(strings.NewReader(`{"alarms": [{"id": "A", "source": "S", "kind": "digital"}], "journal": {"retention": "8760h"}}`))
+	if err != nil || len(c.Alarms) != 1 || c.Journal.Retention != 8760*time.Hour {
+		t.Fatalf("%+v, %v", c, err)
+	}
+	if c, err := ParseConfig(strings.NewReader(`{"alarms": []}`)); err != nil || c.Journal.Retention != 0 {
+		t.Errorf("no journal: %+v, %v", c, err)
 	}
 }

@@ -128,7 +128,11 @@ type EventQuery struct {
 	Kinds []string  `json:"kinds,omitempty"` // e.g. ACTIVATED, RTN, SHELVED
 	Since time.Time `json:"since,omitzero"`
 	Until time.Time `json:"until,omitzero"`
-	Limit int       `json:"limit,omitempty"` // most recent entries; 0 = DefaultLimit, capped at MaxLimit
+	Limit int       `json:"limit,omitempty"` // most recent entries (oldest, with Oldest); 0 = DefaultLimit, capped at MaxLimit
+	// Oldest pages from the oldest match: a long range, such as a day for a
+	// report, is read with Offset 0, Limit n, then Offset n, and so on.
+	Oldest bool `json:"oldest,omitempty"`
+	Offset int  `json:"offset,omitempty"` // matches skipped first
 }
 
 // Limits on EventQuery.Limit.
@@ -225,8 +229,10 @@ func commandError(err error) error {
 }
 
 func (s *service) QueryEvents(ctx context.Context, q EventQuery) ([]Event, error) {
-	f := journal.Filter{Alarm: q.Alarm, Since: q.Since, Until: q.Until, Limit: q.Limit}
+	f := journal.Filter{Alarm: q.Alarm, Since: q.Since, Until: q.Until, Limit: q.Limit, Oldest: q.Oldest, Offset: q.Offset}
 	switch {
+	case f.Offset < 0:
+		return nil, errorf(CodeInvalid, "offset must not be negative")
 	case f.Limit < 0:
 		return nil, errorf(CodeInvalid, "limit must not be negative")
 	case f.Limit == 0:

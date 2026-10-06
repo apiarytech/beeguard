@@ -67,3 +67,16 @@ func TestMemoryMax(t *testing.T) {
 		t.Fatalf("got %v", got)
 	}
 }
+
+func TestRetain(t *testing.T) {
+	m := NewMemory(0)
+	now := time.Now()
+	m.Publish(context.Background(), []alarm.Event{{Alarm: "old", Time: now.Add(-48 * time.Hour)}, {Alarm: "new", Time: now}})
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel() // purges once, then returns
+	Retain(ctx, m, 24*time.Hour, 0, func(err error) { t.Error(err) })
+	if got, _ := m.Query(context.Background(), Filter{}); len(got) != 1 || got[0].Alarm != "new" {
+		t.Errorf("after retention: %+v", got)
+	}
+	Retain(context.Background(), m, 0, 0, nil) // keeps everything: returns at once
+}

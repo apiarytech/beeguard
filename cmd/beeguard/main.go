@@ -141,10 +141,11 @@ func run(ctx context.Context, o options, logOut io.Writer) error {
 	if err != nil {
 		return err
 	}
-	defs, err := config.Load(o.alarmsPath)
+	cfg, err := config.LoadConfig(o.alarmsPath)
 	if err != nil {
 		return err
 	}
+	defs := cfg.Alarms
 	token := o.token
 	if token == "" && o.tokenEnv != "" {
 		token = os.Getenv(o.tokenEnv)
@@ -219,6 +220,11 @@ func run(ctx context.Context, o options, logOut io.Writer) error {
 	}
 	start(bridge.Run)
 	start(func(ctx context.Context) error { return eng.Run(ctx, o.tick) })
+	if p, ok := j.(journal.Purger); ok && cfg.Journal.Retention > 0 {
+		wg.Go(func() {
+			journal.Retain(runCtx, p, cfg.Journal.Retention, time.Hour, func(err error) { logger.Warn("journal retention", "err", err) })
+		})
+	}
 
 	logger.Info("started", "alarms", len(defs), "sources", strings.Join(eng.Sources(), ","),
 		"journal", o.journalPath, "tags_port", o.tagsPort, "api_port", o.apiPort)

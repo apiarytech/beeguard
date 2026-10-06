@@ -65,7 +65,7 @@ named by `-token-env`, `BEEGUARD_TOKEN` by default).
 | `GET /v1/alarms/active` | | alarms in alarm or waiting for an acknowledgement, most urgent first |
 | `GET /v1/alarms/{id}` | | one alarm |
 | `POST /v1/alarms/{id}/commands` | `{"command": "ack", "user": "franklin"}` | the alarm after the command |
-| `GET /v1/events` | `alarm`, `kind` (repeatable), `since`, `until` (RFC 3339), `limit` | journal entries, oldest first |
+| `GET /v1/events` | `alarm`, `kind` (repeatable), `since`, `until` (RFC 3339), `limit`, `offset`, `oldest` (`true`: `limit` and `offset` count from the oldest match, to page through a range) | journal entries, oldest first |
 
 Commands: `ack`, `reset`, `shelve` (with optional `shelve_minutes` and
 `one_shot`), `unshelve`, `suppress`, `unsuppress`, `disable`, `enable`,
