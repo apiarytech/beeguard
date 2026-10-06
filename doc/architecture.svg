@@ -1,0 +1,171 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1210" height="650" viewBox="0 0 1210 650" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <title>beeguard architecture</title>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#333"/>
+    </marker>
+    <style>
+      .t  { font-size: 12.5px; font-weight: 600; fill: #1f1f1f; text-anchor: middle; }
+      .s  { font-size: 11px; fill: #444; text-anchor: middle; }
+      .h  { font-size: 14px; font-weight: 700; fill: #1f1f1f; }
+      .hs { font-size: 12px; font-weight: 400; fill: #555; }
+      .g  { font-size: 11.5px; font-weight: 600; fill: #3d6fb3; }
+      .l  { font-size: 10.5px; fill: #333; }
+      .bh { fill: #eaf1fb; stroke: #3d6fb3; stroke-width: 1.5; }
+      .bi { fill: #ffffff; stroke: #3d6fb3; stroke-width: 1.2; }
+      .dh { fill: #fff3e0; stroke: #c47a14; stroke-width: 1.5; }
+      .ex { fill: #ffffff; stroke: #555; stroke-width: 1.3; }
+      .ln { stroke: #333; stroke-width: 1.4; fill: none; }
+    </style>
+  </defs>
+
+  <rect width="1210" height="650" fill="#ffffff"/>
+
+  <text x="20" y="32" style="font-size:20px;font-weight:700;fill:#1f1f1f">beeguard · architecture</text>
+  <text x="20" y="52" style="font-size:12.5px;fill:#555">An ISA-18.2 alarm and event server on honeycomb tag databases: it decides which alarms the values raise, records every event, and offers the alarms over HTTPS.</text>
+
+  <!-- Module -->
+  <rect x="250" y="64" width="750" height="500" rx="10" fill="#fbfbfb" stroke="#333" stroke-width="1.6"/>
+  <text x="266" y="84" class="h">github.com/apiarytech/beeguard <tspan class="hs">(standard library + honeycomb, royaljelly)</tspan></text>
+
+  <!-- Row 1: tags -->
+  <rect x="270" y="100" width="150" height="66" rx="5" class="bi"/>
+  <text x="345" y="122" class="t">link</text>
+  <text x="345" y="140" class="s">remote honeycomb DBs</text>
+  <text x="345" y="155" class="s">HTTPS · CA · token</text>
+
+  <rect x="440" y="100" width="160" height="66" rx="5" class="dh"/>
+  <text x="520" y="122" class="t">beeguard's TagDatabase</text>
+  <text x="520" y="140" class="s">alias tags of linked ones</text>
+  <text x="520" y="155" class="s">status · command tags</text>
+
+  <rect x="620" y="100" width="170" height="66" rx="5" class="bi"/>
+  <text x="705" y="122" class="t">tagbridge</text>
+  <text x="705" y="140" class="s">follows each change feed</text>
+  <text x="705" y="155" class="s">writes status, reads commands</text>
+
+  <path d="M420,133 H438" class="ln" marker-end="url(#a)"/>
+  <path d="M600,133 H618" class="ln" marker-start="url(#a)" marker-end="url(#a)"/>
+
+  <!-- Pure core -->
+  <rect x="270" y="196" width="710" height="134" rx="8" class="bh"/>
+  <text x="286" y="214" class="g">pure: never reads the clock, the network or a file</text>
+
+  <rect x="290" y="226" width="180" height="70" rx="5" class="bi"/>
+  <text x="380" y="247" class="t">evaluator</text>
+  <text x="380" y="265" class="s">value → condition, per alarm</text>
+  <text x="380" y="281" class="s">digital · high · low · rate · quality</text>
+
+  <rect x="490" y="226" width="180" height="70" rx="5" class="bi"/>
+  <text x="580" y="247" class="t">alarm</text>
+  <text x="580" y="265" class="s">ISA-18.2 state machine</text>
+  <text x="580" y="281" class="s">ack · latch · shelve · delays</text>
+
+  <rect x="690" y="226" width="270" height="70" rx="5" class="bi"/>
+  <text x="825" y="247" class="t">engine</text>
+  <text x="825" y="265" class="s">every alarm · deadline-driven, in device time</text>
+  <text x="825" y="281" class="s">events in order to every sink</text>
+
+  <path d="M470,261 H488" class="ln" marker-end="url(#a)"/>
+  <path d="M670,261 H688" class="ln" marker-end="url(#a)"/>
+  <path d="M780,296 V316 H380 V298" class="ln" marker-end="url(#a)"/>
+  <text x="560" y="312" class="l">sample</text>
+  <path d="M690,166 V224" class="ln" marker-end="url(#a)"/>
+  <text x="684" y="194" class="l" text-anchor="end">samples</text>
+  <path d="M760,224 V168" class="ln" marker-end="url(#a)"/>
+  <text x="766" y="190" class="l">events → status tags</text>
+
+  <!-- Row 3: sinks and API -->
+  <rect x="270" y="358" width="200" height="70" rx="5" class="bi"/>
+  <text x="370" y="379" class="t">journal</text>
+  <text x="370" y="397" class="s">memory · JSON Lines file</text>
+  <text x="370" y="413" class="s">SQL (sqljournal)</text>
+
+  <rect x="490" y="358" width="150" height="70" rx="5" class="bi"/>
+  <text x="565" y="379" class="t">sink/slogsink</text>
+  <text x="565" y="397" class="s">events to log/slog</text>
+
+  <rect x="660" y="358" width="150" height="70" rx="5" class="bi"/>
+  <text x="735" y="379" class="t">api.Service</text>
+  <text x="735" y="397" class="s">transport neutral</text>
+  <text x="735" y="413" class="s">alarms · commands · events</text>
+
+  <rect x="830" y="358" width="150" height="70" rx="5" class="bi"/>
+  <text x="905" y="379" class="t">api/httpapi</text>
+  <text x="905" y="397" class="s">HTTPS + JSON</text>
+  <text x="905" y="413" class="s">standard library</text>
+
+  <path d="M370,330 V356" class="ln" marker-end="url(#a)"/>
+  <path d="M565,330 V356" class="ln" marker-end="url(#a)"/>
+  <path d="M735,330 V356" class="ln" marker-start="url(#a)" marker-end="url(#a)"/>
+  <path d="M810,393 H828" class="ln" marker-start="url(#a)" marker-end="url(#a)"/>
+
+  <!-- Row 4 -->
+  <rect x="270" y="460" width="200" height="66" rx="5" class="bi"/>
+  <text x="370" y="482" class="t">config</text>
+  <text x="370" y="500" class="s">JSON alarm definitions</text>
+  <text x="370" y="515" class="s">→ engine.Definition</text>
+
+  <rect x="490" y="460" width="230" height="66" rx="5" class="bi"/>
+  <text x="605" y="482" class="t">cmd/beeguard</text>
+  <text x="605" y="500" class="s">the server: link, bridge, engine,</text>
+  <text x="605" y="515" class="s">journal, both HTTPS APIs</text>
+
+  <rect x="740" y="460" width="240" height="66" rx="5" class="bi"/>
+  <text x="860" y="482" class="t">modbus_sim</text>
+  <text x="860" y="500" class="s">a simulated guard device</text>
+  <text x="860" y="515" class="s">Modbus TCP server, for tests and labs</text>
+
+  <!-- External, left -->
+  <rect x="20" y="100" width="200" height="56" rx="6" class="ex"/>
+  <text x="120" y="122" class="t">Field devices</text>
+  <text x="120" y="140" class="s">Modbus, S7, OPC UA, ...</text>
+  <path d="M120,156 V198" class="ln" marker-end="url(#a)"/>
+
+  <rect x="20" y="200" width="200" height="66" rx="6" class="dh"/>
+  <text x="120" y="222" class="t">Field honeycomb</text>
+  <text x="120" y="240" class="s">its PLC4X connector, in</text>
+  <text x="120" y="255" class="s">a program of its own</text>
+  <path d="M222,233 H246 V133 H268" class="ln" marker-end="url(#a)"/>
+  <text x="18" y="284" class="l">to link: HTTPS change feed (long-poll)</text>
+
+  <rect x="20" y="358" width="200" height="70" rx="6" class="ex"/>
+  <text x="120" y="380" class="t">Journal storage</text>
+  <text x="120" y="398" class="s">a JSON Lines file, or SQLite</text>
+  <text x="120" y="413" class="s">and other SQL databases</text>
+  <path d="M268,393 H222" class="ln" marker-end="url(#a)"/>
+
+  <!-- External, right -->
+  <rect x="1020" y="100" width="170" height="66" rx="6" class="ex"/>
+  <text x="1105" y="122" class="t">HMIs, other DBs</text>
+  <text x="1105" y="140" class="s">honeycomb tag API:</text>
+  <text x="1105" y="155" class="s">status and command tags</text>
+  <path d="M790,133 H1018" class="ln" marker-start="url(#a)" marker-end="url(#a)"/>
+
+  <rect x="1020" y="228" width="170" height="66" rx="6" class="dh"/>
+  <text x="1105" y="250" class="t">beehive alarms</text>
+  <text x="1105" y="268" class="s">the engine and api.Service,</text>
+  <text x="1105" y="283" class="s">in process, on its tags</text>
+  <path d="M960,261 H1018" class="ln" marker-start="url(#a)" marker-end="url(#a)"/>
+
+  <rect x="1020" y="360" width="170" height="66" rx="6" class="ex"/>
+  <text x="1105" y="382" class="t">Services, dashboards</text>
+  <text x="1105" y="400" class="s">beeguard API: alarms,</text>
+  <text x="1105" y="415" class="s">commands, journal</text>
+  <path d="M980,393 H1018" class="ln" marker-start="url(#a)" marker-end="url(#a)"/>
+
+  <!-- Legend -->
+  <g transform="translate(250,588)">
+    <rect x="0" y="0" width="16" height="12" class="bh"/>
+    <text x="22" y="11" style="font-size:11.5px;fill:#333">beeguard's pure core</text>
+    <rect x="160" y="0" width="16" height="12" class="bi"/>
+    <text x="182" y="11" style="font-size:11.5px;fill:#333">beeguard</text>
+    <rect x="260" y="0" width="16" height="12" class="dh"/>
+    <text x="282" y="11" style="font-size:11.5px;fill:#333">other apiarytech projects</text>
+    <rect x="440" y="0" width="16" height="12" class="ex"/>
+    <text x="462" y="11" style="font-size:11.5px;fill:#333">outside</text>
+    <path d="M530,6 H570" class="ln" marker-end="url(#a)"/>
+    <text x="578" y="11" style="font-size:11.5px;fill:#333">values, events, commands</text>
+    <text x="0" y="36" style="font-size:11.5px;fill:#555">Only link, tagbridge and cmd/beeguard know honeycomb; nothing in the module knows PLC4X. Details: alarm-model.md, conditions.md, api.md, tags.md in this folder.</text>
+  </g>
+</svg>
