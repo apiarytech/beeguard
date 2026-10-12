@@ -65,6 +65,11 @@ type fileAlarm struct {
 	MaxShelve     string `json:"maxShelve"`
 	ChatterCount  int    `json:"chatterCount"`
 	ChatterWindow string `json:"chatterWindow"`
+
+	// Disabled takes the alarm out of service by its settings: it is not
+	// evaluated until the setting is cleared. The host applies it with the
+	// engine's Disable and Enable, so the journal records who changed it.
+	Disabled bool `json:"disabled,omitempty"`
 }
 
 // fileJournal is the journal's settings in an alarms file.
@@ -196,5 +201,6 @@ func (fa fileAlarm) definition() (engine.Definition, error) {
 			OnDelay:  durations[1],
 			OffDelay: durations[2],
 		},
+		Disabled: fa.Disabled,
 	}, nil
 }

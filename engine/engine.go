@@ -34,6 +34,11 @@ type Definition struct {
 	Alarm     alarm.Config
 	Source    string // name of the value the condition is evaluated on, e.g. a tag
 	Condition evaluator.Config
+	// Disabled: the definition takes the alarm out of service. The engine
+	// does not apply it by itself: the host calls Disable or Enable when the
+	// setting changes, with the user who changed it, so the journal records
+	// them and an operator's own out of service is left alone.
+	Disabled bool
 }
 
 // Sink receives events in the order they happened. Publish is called from the
