@@ -61,7 +61,7 @@ Each linked tag becomes a local remote-alias tag that alarms use as `source`.
 | `severity` | 500 | 1..1000 |
 | `ackRequired` | true | |
 | `latched` | false | stays in alarm until acknowledged and reset |
-| `maxShelve` | 0 | longest shelve; 0 = cannot be shelved |
+| `maxShelve` | 24h | longest shelve; "0s" = cannot be shelved (D-38) |
 | `chatterCount`, `chatterWindow` | 0 | chatter detection; 0 = off |
 
 Durations are Go durations (`500ms`, `15s`, `8h`). Unknown keys are rejected

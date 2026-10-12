@@ -93,3 +93,20 @@ func TestParseConfigJournal(t *testing.T) {
 		t.Errorf("no journal: %+v, %v", c, err)
 	}
 }
+
+// An alarm without a longest shelving may be shelved a day; "0s" forbids it
+// (D-38).
+func TestDefaultMaxShelve(t *testing.T) {
+	defs, err := Parse(strings.NewReader(`{"alarms": [
+		{"id": "A", "source": "T", "kind": "digital"},
+		{"id": "B", "source": "T", "kind": "digital", "maxShelve": "0s"},
+		{"id": "C", "source": "T", "kind": "digital", "maxShelve": "8h"}]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i, want := range []time.Duration{24 * time.Hour, 0, 8 * time.Hour} {
+		if got := defs[i].Alarm.MaxShelve; got != want {
+			t.Errorf("%s: MaxShelve %v, want %v", defs[i].Alarm.ID, got, want)
+		}
+	}
+}

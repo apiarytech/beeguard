@@ -464,6 +464,18 @@ under a lock with the alarm's current status at the time of writing.
 `Ack`, before the command tag was subscribed, so the command was never seen;
 and a status written from an older snapshot could overwrite a newer one.
 
+## D-38. An alarm that gives no longest shelving may be shelved for a day
+
+**Decision.** In the configuration file, an alarm without `maxShelve` may be
+shelved for up to 24 hours (`config.DefaultMaxShelve`); `"maxShelve": "0s"`
+forbids shelving. `alarm.Config.MaxShelve` keeps D-7's meaning: zero cannot
+be shelved. Only the file's default changes.
+
+**Why.** Operators shelve nuisance alarms during maintenance, and nearly no
+configuration gave `maxShelve`, so shelving failed for almost every alarm
+(drone review, 2026-10-11). A day keeps shelving time limited, as ISA-18.2
+asks (D-7), and an alarm that must never be shelved still says so.
+
 ---
 
 ## Open items

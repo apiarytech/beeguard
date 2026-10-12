@@ -40,6 +40,7 @@ import (
 	"io"
 	"os"
 	"reflect"
+	"strings"
 	"time"
 
 	"github.com/apiarytech/beeguard/alarm"
@@ -165,7 +166,13 @@ func Parse(r io.Reader) ([]engine.Definition, error) {
 
 func (fa fileAlarm) definition() (engine.Definition, error) {
 	var durations [5]time.Duration
-	for i, s := range []string{fa.Period, fa.OnDelay, fa.OffDelay, fa.MaxShelve, fa.ChatterWindow} {
+	// An alarm that gives no longest shelving may be shelved for a day (D-38);
+	// "0s" forbids shelving.
+	maxShelve := fa.MaxShelve
+	if strings.TrimSpace(maxShelve) == "" {
+		maxShelve = DefaultMaxShelve.String()
+	}
+	for i, s := range []string{fa.Period, fa.OnDelay, fa.OffDelay, maxShelve, fa.ChatterWindow} {
 		if s == "" {
 			continue
 		}
@@ -204,3 +211,8 @@ func (fa fileAlarm) definition() (engine.Definition, error) {
 		Disabled: fa.Disabled,
 	}, nil
 }
+
+// DefaultMaxShelve is the longest shelving of an alarm whose configuration
+// gives none (D-38): still time limited, as ISA-18.2 asks. "maxShelve": "0s"
+// forbids shelving.
+const DefaultMaxShelve = 24 * time.Hour
