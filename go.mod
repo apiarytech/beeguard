@@ -1,6 +1,6 @@
 module github.com/apiarytech/beeguard
 
-go 1.27.1
+go 1.27.2
 
 require (
 	github.com/apiarytech/honeycomb v0.2.0

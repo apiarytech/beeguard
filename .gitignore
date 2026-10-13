@@ -1,3 +1,4 @@
 # Development certificates and keys are created on first run (-dev-cert);
 # never commit them.
 examples/guard/dev/
+examples/guard/field/field.exe

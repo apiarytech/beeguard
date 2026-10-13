@@ -21,7 +21,7 @@ jobs:
           - macos-latest
           - windows-latest
         go:
-          - '1.27.1' # Minimum version. Keep in sync with the go directive in go.mod.
+          - '1.27.2' # Minimum version. Keep in sync with the go directive in go.mod.
           - 'stable'
     runs-on: ${{ matrix.os }}
 
@@ -156,7 +156,7 @@ jobs:
       - name: Set up TinyGo
         uses: acifani/setup-tinygo@v3
         with:
-          tinygo-version: '0.42.0'
+          tinygo-version: '0.43.0'
 
       # The alarm model, engine, evaluator, journal interface and API run
       # under TinyGo. tagbridge and link do not: they import honeycomb, whose
