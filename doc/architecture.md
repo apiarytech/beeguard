@@ -150,8 +150,10 @@ its events reach every sink. See [decisions.md](decisions.md#d-12-events-are-del
    `-tags sqlite` build; empty keeps it in memory.
 4. Build the engine with its sinks: journal, slog, tag bridge.
 5. `bridge.Setup()` checks the source tags and creates status and command tags.
-6. Start honeycomb's tag API (`-tags-port`) and the beeguard API (`-api-port`).
-7. Run the bridge, the engine scheduler and the API server until Ctrl+C. If one
-   fails, the others stop and the error is returned.
+6. Bind honeycomb's tag API (`-tags-port`) and the beeguard API (`-api-port`).
+   A port that is in use stops the start with an error.
+7. Run the bridge, the engine scheduler and both servers until Ctrl+C or
+   SIGTERM (`docker stop`, Kubernetes, systemd). If one fails, the others stop
+   and the error is returned. Either way the journal is closed.
 
 Alarm state lives only in memory; see [decisions.md](decisions.md#d-23-alarm-state-is-not-persisted).

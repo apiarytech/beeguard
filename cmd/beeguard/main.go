@@ -40,6 +40,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/apiarytech/honeycomb"
@@ -87,7 +88,8 @@ func main() {
 	flag.StringVar(&o.logLevel, "log-level", "info", "lowest level logged: debug, info, warn or error")
 	flag.Parse()
 
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	// SIGTERM is what docker stop, Kubernetes and systemd send.
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	if err := run(ctx, o, os.Stderr); err != nil && !errors.Is(err, context.Canceled) {
 		fmt.Fprintln(os.Stderr, "beeguard:", err)
