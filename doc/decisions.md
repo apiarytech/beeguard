@@ -453,7 +453,7 @@ of pulses looked like chattering. Now:
   fall behind what was already evaluated, and an alarm's first sample still
   needs a time within `maxSkew`);
 - a bad-quality sample does not move an alarm's clock on, and `Tick` leaves
-  it while the source's last sample is bad, except for a `bad_quality` alarm,
+  it while the source's last sample is bad, except for a `bad-quality` alarm,
   whose delays run on the clock;
 - a delay that came due between two replayed changes expires at its own time;
 - the alarm (and so chatter detection) is given the evaluation time, not the
