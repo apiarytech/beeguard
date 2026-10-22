@@ -455,8 +455,9 @@ func (e *Engine) Snapshot() map[string]alarm.Snapshot {
 // survive a restart, and an alarm still active stays active without a new
 // activation. States of alarms no longer defined are ignored; it returns the
 // errors of states that do not fit their alarm's definition (those alarms
-// start from normal). The evaluators start afresh: an on-delay in progress
-// starts again.
+// start from normal). Each evaluator starts from the restored condition, so
+// the first normal sample returns a restored active alarm to normal; a delay
+// in progress starts again.
 func (e *Engine) Restore(states map[string]alarm.Snapshot) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
@@ -468,7 +469,9 @@ func (e *Engine) Restore(states map[string]alarm.Snapshot) error {
 		}
 		if err := en.alarm.Restore(s); err != nil {
 			errs = append(errs, err)
+			continue
 		}
+		en.eval.Restore(s.Condition)
 	}
 	return errors.Join(errs...)
 }

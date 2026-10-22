@@ -169,6 +169,13 @@ func (e *Evaluator) Update(s Sample, now time.Time) bool {
 	return e.filter(now)
 }
 
+// Restore starts the evaluator from a known condition, as after a restart
+// with the alarm restored active: Active reports active until a sample
+// changes it, so the first normal sample returns the alarm to normal.
+func (e *Evaluator) Restore(active bool) {
+	e.raw, e.active, e.pending = active, active, false
+}
+
 // Tick expires delays and samples rates of change; it reports whether Active changed.
 func (e *Evaluator) Tick(now time.Time) bool {
 	if !e.have {

@@ -54,8 +54,10 @@ func (a *Alarm) Snapshot() Snapshot {
 
 // Restore gives the alarm a state saved by Snapshot. It emits no events: the
 // state is what the journal last recorded. A latched state for an alarm that
-// is no longer latched, or a shelve the definition no longer allows, is
-// refused.
+// is no longer latched, or a shelve the definition no longer allows
+// (MaxShelve is zero), is refused. A shelve's expiry is capped at its start
+// plus the current MaxShelve, and chattering is dropped when the definition
+// no longer detects it.
 func (a *Alarm) Restore(s Snapshot) error {
 	switch s.Base {
 	case Normal, ActiveUnacked, ActiveAcked, RTNUnacked:
@@ -65,6 +67,20 @@ func (a *Alarm) Restore(s Snapshot) error {
 		}
 	default:
 		return fmt.Errorf("alarm %s: %s is not an alarm state", a.cfg.ID, s.Base)
+	}
+	if s.Shelved && a.cfg.MaxShelve <= 0 {
+		return fmt.Errorf("alarm %s: shelved, but it may not be shelved", a.cfg.ID)
+	}
+	if s.Shelved && !s.ShelveTime.IsZero() {
+		if limit := s.ShelveTime.Add(a.cfg.MaxShelve); s.ShelveExpiry.IsZero() || s.ShelveExpiry.After(limit) {
+			s.ShelveExpiry = limit
+		}
+	}
+	switch {
+	case a.cfg.ChatterCount == 0:
+		s.Chattering, s.Rises = false, nil
+	case len(s.Rises) > a.cfg.ChatterCount:
+		s.Rises = s.Rises[len(s.Rises)-a.cfg.ChatterCount:]
 	}
 	a.cond, a.base = s.Condition, s.Base
 	a.shelved, a.oneShot, a.suppressed, a.disabled, a.chattering = s.Shelved, s.OneShot, s.Suppressed, s.Disabled, s.Chattering
