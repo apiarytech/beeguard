@@ -341,3 +341,66 @@ func TestBusyTagsPort(t *testing.T) {
 		t.Errorf("logged started before failing:\n%s", logs.String())
 	}
 }
+
+// TestDisabledInConfigIssue2 covers issue #2: an alarm configured with
+// "disabled": true is taken out of service and not evaluated.
+func TestDisabledInConfigIssue2(t *testing.T) {
+	dir := t.TempDir()
+	certFile, keyFile, err := devcert.Ensure(filepath.Join(dir, "dev"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	field := honeycomb.NewTagDatabase()
+	if err := field.AddTag(&honeycomb.Tag{Name: "T", TypeInfo: &honeycomb.TypeInfo{DataType: honeycomb.TypeREAL}, Value: plc.REAL(0)}); err != nil {
+		t.Fatal(err)
+	}
+	fieldPort := freePort(t)
+	fieldCtx, stopField := context.WithCancel(context.Background())
+	defer stopField()
+	honeycomb.StartServer(field, []string{"field-token"}, fieldPort, certFile, keyFile, nil, fieldCtx)
+	write := func(name, content string) string {
+		path := filepath.Join(dir, name)
+		if err := os.WriteFile(path, []byte(content), 0o600); err != nil {
+			t.Fatal(err)
+		}
+		return path
+	}
+	t.Setenv("FIELD_TOKEN", "field-token")
+	o := options{
+		linksPath: write("links.json", fmt.Sprintf(`{"databases": [{"id": "field1", "url": "https://127.0.0.1:%s",
+			"tokenEnv": "FIELD_TOKEN", "caFile": %q, "tags": ["T"]}]}`, fieldPort, filepath.ToSlash(certFile))),
+		alarmsPath: write("alarms.json", `{"alarms": [
+			{"id": "Off", "source": "T", "kind": "high", "limit": 1, "severity": 500, "disabled": true},
+			{"id": "On", "source": "T", "kind": "high", "limit": 1, "severity": 500}]}`),
+		journalPath: filepath.Join(dir, "journal.jsonl"),
+		tick:        time.Second, feedWait: time.Second, skew: 5 * time.Second, poll: 50 * time.Millisecond,
+		user: "hmi", logFormat: "text", logLevel: "info",
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	logs := &syncBuffer{}
+	done := make(chan error, 1)
+	go func() { done <- run(ctx, o, logs) }()
+	eventually(t, "started", logs, func() bool { return strings.Contains(logs.String(), "started") })
+	if err := field.SetTagValue("T", plc.REAL(5)); err != nil {
+		t.Fatal(err)
+	}
+	reader, err := filejournal.Open(o.journalPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer reader.Close()
+	eventually(t, "the enabled alarm to activate", logs, func() bool {
+		events, _ := reader.Query(ctx, journal.Filter{Alarm: "On", Kinds: []alarm.EventKind{alarm.Activated}})
+		return len(events) == 1
+	})
+	if events, _ := reader.Query(ctx, journal.Filter{Alarm: "Off", Kinds: []alarm.EventKind{alarm.Activated}}); len(events) != 0 {
+		t.Errorf("the disabled alarm activated: %+v", events)
+	}
+	disabled, _ := reader.Query(ctx, journal.Filter{Alarm: "Off", Kinds: []alarm.EventKind{alarm.Disabled}})
+	if len(disabled) != 1 || disabled[0].User != "config" {
+		t.Errorf("journal Disabled events = %+v, want one by \"config\"", disabled)
+	}
+	cancel()
+	<-done
+}

@@ -196,6 +196,16 @@ func run(ctx context.Context, o options, logOut io.Writer) error {
 	if err := bridge.Setup(); err != nil {
 		return err
 	}
+	// "disabled": true in the configuration takes the alarm out of service.
+	// The engine leaves applying it to the host, so the journal records who
+	// did it (here: the configuration).
+	for _, def := range defs {
+		if def.Disabled {
+			if err := eng.Disable(def.Alarm.ID, "config"); err != nil {
+				return fmt.Errorf("disable %s: %w", def.Alarm.ID, err)
+			}
+		}
+	}
 
 	var apiSrv, tagSrv *http.Server
 	if o.apiPort != "" {
