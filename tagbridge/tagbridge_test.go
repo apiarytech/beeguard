@@ -467,3 +467,41 @@ func TestResyncUsesBatchRead(t *testing.T) {
 		})
 	}
 }
+
+// TestTagNameCollisionsIssue3 covers issue #3: alarm IDs that map to the same
+// status or command tag are refused by Setup.
+func TestTagNameCollisionsIssue3(t *testing.T) {
+	for _, ids := range [][2]string{{"Tank1.High", "Tank1_High"}, {"Tank1", "Tank1_CMD"}, {"A B", "A-B"}} {
+		db := honeycomb.NewTagDatabase()
+		if err := db.AddTag(&honeycomb.Tag{Name: "S", TypeInfo: &honeycomb.TypeInfo{DataType: honeycomb.TypeBOOL}, Value: plc.BOOL(false)}); err != nil {
+			t.Fatal(err)
+		}
+		var defs []engine.Definition
+		for _, id := range ids {
+			defs = append(defs, engine.Definition{Alarm: alarm.Config{ID: id, Severity: 100}, Source: "S", Condition: evaluator.Config{Kind: evaluator.Digital}})
+		}
+		b := New(db, nil)
+		eng, err := engine.New(defs, engine.WithSink(b))
+		if err != nil {
+			t.Fatal(err)
+		}
+		b.SetEngine(eng)
+		err = b.Setup()
+		if err == nil || !strings.Contains(err.Error(), ids[0]) || !strings.Contains(err.Error(), ids[1]) {
+			t.Errorf("Setup with %q and %q = %v, want an error naming both", ids[0], ids[1], err)
+		}
+	}
+}
+
+// TestIsCommandTag covers the write rule of the tag API (issue #6).
+func TestIsCommandTag(t *testing.T) {
+	f := setup(t)
+	for name, want := range map[string]bool{
+		"ALM_Guard1_TempHigh_CMD": true, "ALM_Guard1_TempHigh_CMD.Ack": true,
+		"ALM_Guard1_TempHigh": false, "ALM_Guard1_TempHigh.State": false, "Guard1.Temp": false, "ALM_Nope_CMD": false,
+	} {
+		if got := f.bridge.IsCommandTag(name); got != want {
+			t.Errorf("IsCommandTag(%q) = %v, want %v", name, got, want)
+		}
+	}
+}

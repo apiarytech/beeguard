@@ -188,6 +188,19 @@ func (b *Bridge) Setup() error {
 			return fmt.Errorf("tagbridge: source tag %q does not exist", source)
 		}
 	}
+	// Tag names replace every character other than letters, digits and _ in
+	// an alarm ID, so "Tank1.High" and "Tank1_High" would share their status
+	// and command tags, and "A_CMD"'s status tag is "A"'s command tag:
+	// refuse such IDs instead of mixing up two alarms.
+	owner := make(map[string]string)
+	for _, s := range b.eng.Statuses() {
+		for _, name := range []string{b.StatusTag(s.ID), b.CommandTag(s.ID)} {
+			if other, taken := owner[name]; taken {
+				return fmt.Errorf("tagbridge: alarms %q and %q both map to tag %s; rename one", other, s.ID, name)
+			}
+			owner[name] = s.ID
+		}
+	}
 	for _, s := range b.eng.Statuses() {
 		if err := b.ensure(b.StatusTag(s.ID), "Alarm status: "+s.ID, toUDT(s)); err != nil {
 			return err
