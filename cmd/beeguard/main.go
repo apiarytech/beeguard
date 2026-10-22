@@ -26,12 +26,14 @@ package main
 
 import (
 	"context"
+	"crypto/subtle"
 	"crypto/tls"
 	"errors"
 	"flag"
 	"fmt"
 	"io"
 	"log/slog"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -193,9 +195,14 @@ func run(ctx context.Context, o options, logOut io.Writer) error {
 		return err
 	}
 
-	var apiSrv *http.Server
+	var apiSrv, tagSrv *http.Server
 	if o.apiPort != "" {
 		if apiSrv, err = apiServer(o.apiPort, certFile, keyFile, httpapi.New(api.New(eng, j), []string{token})); err != nil {
+			return err
+		}
+	}
+	if o.tagsPort != "" {
+		if tagSrv, err = tagServer(db, o.tagsPort, certFile, keyFile, token, bridge); err != nil {
 			return err
 		}
 	}
@@ -212,11 +219,23 @@ func run(ctx context.Context, o options, logOut io.Writer) error {
 			}
 		})
 	}
-	if o.tagsPort != "" {
-		honeycomb.StartServer(db, []string{token}, o.tagsPort, certFile, keyFile, nil, runCtx)
-	}
-	if apiSrv != nil {
-		start(func(ctx context.Context) error { return serve(ctx, apiSrv) })
+	// Both servers bind before "started" is logged, so a busy port fails
+	// the start with an error instead of after it.
+	for _, srv := range []struct {
+		name string
+		srv  *http.Server
+	}{{"tags", tagSrv}, {"api", apiSrv}} {
+		if srv.srv == nil {
+			continue
+		}
+		ln, err := net.Listen("tcp", srv.srv.Addr)
+		if err != nil {
+			cancel()
+			wg.Wait()
+			return fmt.Errorf("%s: %w", srv.name, err)
+		}
+		name, s := srv.name, srv.srv
+		start(func(ctx context.Context) error { return serve(ctx, name, s, ln) })
 	}
 	start(bridge.Run)
 	start(func(ctx context.Context) error { return eng.Run(ctx, o.tick) })
@@ -241,6 +260,41 @@ func run(ctx context.Context, o options, logOut io.Writer) error {
 	return ctx.Err()
 }
 
+// tagServer returns honeycomb's tag API for db. Every request needs the
+// token. Writes are allowed only on the alarms' command tags: status tags
+// and linked source tags are read-only, so an HMI cannot fake an alarm state
+// or write through to the field database.
+func tagServer(db *honeycomb.TagDatabase, port, certFile, keyFile, token string, bridge *tagbridge.Bridge) (*http.Server, error) {
+	pair, err := tls.LoadX509KeyPair(certFile, keyFile)
+	if err != nil {
+		return nil, fmt.Errorf("tags: %w", err)
+	}
+	srv, err := honeycomb.NewServer(db, honeycomb.ServerOptions{
+		Addr:      ":" + port,
+		TLSConfig: &tls.Config{MinVersion: tls.VersionTLS12, Certificates: []tls.Certificate{pair}},
+		Authorize: tagAuthorizer(token, bridge.IsCommandTag),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("tags: %w", err)
+	}
+	return srv, nil
+}
+
+// tagAuthorizer checks the bearer token in constant time and allows a write
+// (PUT /tags/{name}) only when writable(name).
+func tagAuthorizer(token string, writable func(name string) bool) func(*http.Request, honeycomb.Access) (string, error) {
+	return func(r *http.Request, access honeycomb.Access) (string, error) {
+		got, ok := strings.CutPrefix(r.Header.Get("Authorization"), "Bearer ")
+		if !ok || token == "" || subtle.ConstantTimeCompare([]byte(got), []byte(token)) != 1 {
+			return "", errors.New("invalid token")
+		}
+		if access == honeycomb.AccessWrite && !writable(strings.TrimPrefix(r.URL.Path, "/tags/")) {
+			return "", honeycomb.ErrForbidden
+		}
+		return "token", nil
+	}
+}
+
 func apiServer(port, certFile, keyFile string, h http.Handler) (*http.Server, error) {
 	pair, err := tls.LoadX509KeyPair(certFile, keyFile)
 	if err != nil {
@@ -260,13 +314,13 @@ func apiServer(port, certFile, keyFile string, h http.Handler) (*http.Server, er
 	}, nil
 }
 
-// serve runs srv until ctx is done, then shuts it down gracefully.
-func serve(ctx context.Context, srv *http.Server) error {
+// serve runs srv on ln until ctx is done, then shuts it down gracefully.
+func serve(ctx context.Context, name string, srv *http.Server, ln net.Listener) error {
 	errc := make(chan error, 1)
-	go func() { errc <- srv.ListenAndServeTLS("", "") }()
+	go func() { errc <- srv.ServeTLS(ln, "", "") }()
 	select {
 	case err := <-errc:
-		return fmt.Errorf("api: %w", err)
+		return fmt.Errorf("%s: %w", name, err)
 	case <-ctx.Done():
 		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()

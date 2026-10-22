@@ -152,6 +152,23 @@ func (b *Bridge) StatusTag(id string) string { return b.prefix + sanitize(id) }
 // CommandTag returns the name of an alarm's command tag.
 func (b *Bridge) CommandTag(id string) string { return b.StatusTag(id) + "_CMD" }
 
+// IsCommandTag reports whether name is one of the alarms' command tags or a
+// field of one (ALM_Guard1_TempHigh_CMD.Ack): the only tags an HMI writes.
+func (b *Bridge) IsCommandTag(name string) bool {
+	if i := strings.IndexAny(name, ".["); i >= 0 {
+		name = name[:i]
+	}
+	if b.eng == nil {
+		return false
+	}
+	for _, s := range b.eng.Statuses() {
+		if b.CommandTag(s.ID) == name {
+			return true
+		}
+	}
+	return false
+}
+
 func sanitize(id string) string {
 	return strings.Map(func(r rune) rune {
 		if r == '_' || r >= '0' && r <= '9' || r >= 'A' && r <= 'Z' || r >= 'a' && r <= 'z' {

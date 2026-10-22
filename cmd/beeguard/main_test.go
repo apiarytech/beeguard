@@ -189,6 +189,41 @@ func TestEndToEnd(t *testing.T) {
 		t.Fatalf("journal acks = %+v", acks)
 	}
 
+	// honeycomb's tag API: only command tags are writable (issue #6).
+	tagCall := func(method, path, token, body string) int {
+		req, _ := http.NewRequest(method, "https://127.0.0.1:"+o.tagsPort+path, strings.NewReader(body))
+		req.Header.Set("Authorization", "Bearer "+token)
+		resp, err := client.Do(req)
+		if err != nil {
+			t.Fatalf("%s %s: %v", method, path, err)
+		}
+		resp.Body.Close()
+		return resp.StatusCode
+	}
+	for _, c := range []struct {
+		method, path, token, body string
+		want                      int
+	}{
+		{"GET", "/tags/ALM_Guard1_TempHigh", "beeguard-token", "", 200},
+		{"GET", "/tags/ALM_Guard1_TempHigh", "wrong", "", 401},
+		{"PUT", "/tags/ALM_Guard1_TempHigh", "beeguard-token", `{"value": {"State": 7, "Suppressed": true}}`, 403},
+		{"PUT", "/tags/ALM_Guard1_TempHigh.Suppressed", "beeguard-token", `{"value": true}`, 403},
+		{"PUT", "/tags/Guard1.Temp", "beeguard-token", `{"value": 10}`, 403},
+		{"PUT", "/tags/ALM_Guard1_TempHigh_CMD.User", "wrong", `{"value": "x"}`, 401},
+		// Authorized. (honeycomb v0.2.0 answers 400 for a nested STRING
+		// write; v0.2.2 writes it. Either way the write is not refused.)
+		{"PUT", "/tags/ALM_Guard1_TempHigh_CMD.User", "beeguard-token", `{"value": "franklin"}`, 0},
+	} {
+		got := tagCall(c.method, c.path, c.token, c.body)
+		if c.want == 0 {
+			if got == 401 || got == 403 {
+				t.Errorf("tag API %s %s = %d, want the write authorized", c.method, c.path, got)
+			}
+		} else if got != c.want {
+			t.Errorf("tag API %s %s (token %q) = %d, want %d", c.method, c.path, c.token, got, c.want)
+		}
+	}
+
 	// A pulse far shorter than any poll still reaches the journal through the
 	// change feed: close, open and close the lid within microseconds.
 	for _, v := range []plc.BOOL{false, true, false} {
@@ -249,5 +284,60 @@ func TestRunConfigErrors(t *testing.T) {
 		if err := run(context.Background(), o, &syncBuffer{}); err == nil {
 			t.Errorf("%s: run accepted it", name)
 		}
+	}
+}
+
+// TestBusyTagsPort covers issue #7: a busy -tags-port makes run return an
+// error before "started", instead of exiting the process later.
+func TestBusyTagsPort(t *testing.T) {
+	dir := t.TempDir()
+	certFile, keyFile, err := devcert.Ensure(filepath.Join(dir, "dev"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	busy, err := net.Listen("tcp", ":0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer busy.Close()
+	_, port, _ := net.SplitHostPort(busy.Addr().String())
+
+	field := honeycomb.NewTagDatabase()
+	if err := field.AddTag(&honeycomb.Tag{Name: "T", TypeInfo: &honeycomb.TypeInfo{DataType: honeycomb.TypeREAL}, Value: plc.REAL(0)}); err != nil {
+		t.Fatal(err)
+	}
+	fieldPort := freePort(t)
+	fieldCtx, stopField := context.WithCancel(context.Background())
+	defer stopField()
+	honeycomb.StartServer(field, []string{"field-token"}, fieldPort, certFile, keyFile, nil, fieldCtx)
+	write := func(name, content string) string {
+		path := filepath.Join(dir, name)
+		if err := os.WriteFile(path, []byte(content), 0o600); err != nil {
+			t.Fatal(err)
+		}
+		return path
+	}
+	t.Setenv("FIELD_TOKEN", "field-token")
+	o := options{
+		linksPath: write("links.json", fmt.Sprintf(`{"databases": [{"id": "field1", "url": "https://127.0.0.1:%s",
+			"tokenEnv": "FIELD_TOKEN", "caFile": %q, "tags": ["T"]}]}`, fieldPort, filepath.ToSlash(certFile))),
+		alarmsPath:  write("alarms.json", `{"alarms": [{"id": "A", "source": "T", "kind": "high", "limit": 1, "severity": 500}]}`),
+		journalPath: filepath.Join(dir, "journal.jsonl"),
+		tick:        time.Second, feedWait: time.Second, skew: 5 * time.Second, poll: 50 * time.Millisecond,
+		user: "hmi", tagsPort: port, cert: certFile, key: keyFile, token: "t", logFormat: "text", logLevel: "info",
+	}
+	logs := &syncBuffer{}
+	done := make(chan error, 1)
+	go func() { done <- run(context.Background(), o, logs) }()
+	select {
+	case err := <-done:
+		if err == nil || !strings.Contains(err.Error(), "tags") {
+			t.Fatalf("run = %v, want a tags listen error", err)
+		}
+	case <-time.After(10 * time.Second):
+		t.Fatal("run did not return on a busy port")
+	}
+	if strings.Contains(logs.String(), "started") {
+		t.Errorf("logged started before failing:\n%s", logs.String())
 	}
 }

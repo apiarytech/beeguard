@@ -63,7 +63,10 @@ db.SetTagValue("ALM_Guard1_TempHigh_CMD.Shelve", plc.BOOL(true))
 
 Over honeycomb's HTTPS tag API, which beeguard serves on `-tags-port` (8443),
 read `GET /tags/ALM_Guard1_TempHigh` and write
-`PUT /tags/ALM_Guard1_TempHigh_CMD.Ack`. Another honeycomb database can also
+`PUT /tags/ALM_Guard1_TempHigh_CMD.Ack`. Every request needs the `-token`.
+Only the command tags can be written: a write to a status tag or a linked
+source tag gets 403, so a client can't fake an alarm state or write through
+to the field database. Another honeycomb database can also
 link to these tags as remote aliases. Reading the status tag over HTTPS is
 tested; the `DT` time fields currently come through as `{}` because royaljelly's
 `DT` type has no JSON encoding, so read times through the beeguard API
