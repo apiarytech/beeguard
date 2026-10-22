@@ -89,6 +89,13 @@ for the status and command tags.
 - Alarm state is not persisted: after a restart an active condition is
   announced again as unacknowledged and shelving is cleared.
 
+## Contributing
+
+Issues, feature requests and pull requests are welcome: see
+[CONTRIBUTING.md](CONTRIBUTING.md). Contributors sign the [CLA](CLA.md)
+once, because beeguard is dual-licensed. Report vulnerabilities privately as
+described in [SECURITY.md](SECURITY.md), not in a public issue.
+
 ## Licensing
 
 Dual licensed under GPLv3 or a commercial license, like honeycomb. Third-party
