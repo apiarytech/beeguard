@@ -13,7 +13,8 @@
 //
 // Each Publish writes its events with one append and, by default, syncs the
 // file to disk before returning, so an acknowledged event survives a power
-// loss. A line left half-written by a crash is ignored when reading.
+// loss. A line left half-written by a crash is cut off when the journal is
+// opened again, so the next event starts on a line of its own.
 //
 // Query reads the whole file, so it suits journals of up to a few hundred
 // thousand events. Rotate or archive the file for longer histories, or use
@@ -99,8 +100,13 @@ type Journal struct {
 
 var _ journal.Journal = (*Journal)(nil)
 
-// Open opens or creates the journal file for appending.
+// Open opens or creates the journal file for appending. A last line without
+// its newline, left by a crash during a write, is cut off first: appending to
+// it would make one complete but invalid line, and every Query would fail.
 func Open(path string, opts ...Option) (*Journal, error) {
+	if err := dropPartialLine(path); err != nil {
+		return nil, fmt.Errorf("filejournal: %w", err)
+	}
 	f, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o640)
 	if err != nil {
 		return nil, fmt.Errorf("filejournal: %w", err)
@@ -110,6 +116,52 @@ func Open(path string, opts ...Option) (*Journal, error) {
 		opt(j)
 	}
 	return j, nil
+}
+
+// dropPartialLine truncates the file at path after its last newline when
+// its last line has none. A missing file is fine: Open creates it.
+func dropPartialLine(path string) error {
+	f, err := os.OpenFile(path, os.O_RDWR, 0)
+	if errors.Is(err, os.ErrNotExist) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	info, err := f.Stat()
+	if err != nil {
+		return err
+	}
+	size := info.Size()
+	if size == 0 {
+		return nil
+	}
+	// Read backwards to the last newline.
+	buf := make([]byte, 4096)
+	end := size
+	for end > 0 {
+		start := max(end-int64(len(buf)), 0)
+		chunk := buf[:end-start]
+		if _, err := f.ReadAt(chunk, start); err != nil && !errors.Is(err, io.EOF) {
+			return err
+		}
+		if end == size && chunk[len(chunk)-1] == '\n' {
+			return nil // the file ends with a complete line
+		}
+		if i := bytes.LastIndexByte(chunk, '\n'); i >= 0 {
+			return truncateSync(f, start+int64(i)+1)
+		}
+		end = start
+	}
+	return truncateSync(f, 0) // the only line is incomplete
+}
+
+func truncateSync(f *os.File, size int64) error {
+	if err := f.Truncate(size); err != nil {
+		return err
+	}
+	return f.Sync()
 }
 
 // Close closes the file.

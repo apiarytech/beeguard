@@ -126,3 +126,42 @@ func TestReopenAppends(t *testing.T) {
 		t.Fatalf("got %d events after reopening", len(got))
 	}
 }
+
+// TestReopenAfterCrashIssue1 covers issue #1: a half-written last line left
+// by a crash must not break the journal once the next event is appended.
+func TestReopenAfterCrashIssue1(t *testing.T) {
+	ctx := context.Background()
+	for _, tail := range []string{`{"time":"2026-10-01T08:00:01Z","alarm":"A","ki`, `{`} {
+		j, path := open(t)
+		_ = j.Publish(ctx, []alarm.Event{{Time: t0, Alarm: "A", Kind: alarm.Activated}})
+		j.Close()
+		f, _ := os.OpenFile(path, os.O_APPEND|os.O_WRONLY, 0)
+		_, _ = f.WriteString(tail) // the crash
+		f.Close()
+
+		j2, err := Open(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := j2.Publish(ctx, []alarm.Event{{Time: t0.Add(time.Second), Alarm: "A", Kind: alarm.ReturnedToNormal}}); err != nil {
+			t.Fatal(err)
+		}
+		got, err := j2.Query(ctx, journal.Filter{})
+		if err != nil || len(got) != 2 {
+			t.Fatalf("after reopening: %d events, %v; want 2 and no error", len(got), err)
+		}
+		j2.Close()
+	}
+
+	// A file holding only a partial line is emptied; a complete file is kept.
+	path := filepath.Join(t.TempDir(), "journal.jsonl")
+	_ = os.WriteFile(path, []byte(`{"time":`), 0o600)
+	j, err := Open(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	j.Close()
+	if data, _ := os.ReadFile(path); len(data) != 0 {
+		t.Errorf("file = %q, want empty", data)
+	}
+}
