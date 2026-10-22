@@ -114,7 +114,11 @@ the HTTPS link by `ReadTag`).
 Delays and rates are evaluated in **device time** (`-source-time-skew`, 5 s):
 a sample is evaluated at its device timestamp when that is within the skew of
 the server clock, so changes that arrive together are timed as they happened
-in the field. Evaluation time never goes backwards for an alarm.
+in the field. An older device timestamp is also used when it is not before
+the alarm's last evaluation, so changes replayed after a feed outage keep
+their times; while a source has bad quality, its alarms' clocks stand still
+(see [D-35](decisions.md#d-35-delays-and-rates-are-evaluated-in-device-time)).
+Evaluation time never goes backwards for an alarm.
 
 The engine is **deadline-driven**: `engine.Run` sleeps until the earliest
 pending deadline (an on- or off-delay, a rate measurement, a shelve expiry, the

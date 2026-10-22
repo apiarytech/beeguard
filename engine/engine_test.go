@@ -13,6 +13,7 @@ package engine
 import (
 	"context"
 	"errors"
+	"slices"
 	"sync"
 	"testing"
 	"time"
@@ -426,5 +427,87 @@ func TestRunWakesAtDeadline(t *testing.T) {
 	}
 	if took := time.Since(began); took < 50*time.Millisecond {
 		t.Fatalf("fired after %v, before the on-delay", took)
+	}
+}
+
+// replayAfterOutage processes a good sample, a feed outage of 30 s (one
+// bad-quality sample, then Ticks every second), and then the changes the
+// field recorded meanwhile, all arriving at once with their device times.
+func replayAfterOutage(t *testing.T, def Definition, changes map[time.Duration]float64) *recorder {
+	t.Helper()
+	c := &clock{now: time.Date(2026, 10, 1, 8, 0, 0, 0, time.UTC)}
+	r := &recorder{}
+	e, err := New([]Definition{def}, WithClock(c.Now), WithSink(r), WithSourceTime(5*time.Second))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t0 := c.Now()
+	e.Process(def.Source, sample(0, t0))
+	c.Advance(time.Second)
+	e.Process(def.Source, evaluator.Sample{Time: c.Now()}) // the feed fails: bad quality
+	for i := 0; i < 30; i++ {
+		c.Advance(time.Second)
+		e.Tick()
+	}
+	offsets := make([]time.Duration, 0, len(changes))
+	for d := range changes {
+		offsets = append(offsets, d)
+	}
+	slices.Sort(offsets)
+	for _, d := range offsets {
+		e.Process(def.Source, sample(changes[d], t0.Add(d)))
+	}
+	e.Tick()
+	return r
+}
+
+// TestReplayAfterOutageKeepsDeviceTimeIssue4 covers issue #4: a 10 s lid
+// opening with a 2 s on-delay, replayed after an outage, raises the alarm.
+func TestReplayAfterOutageKeepsDeviceTimeIssue4(t *testing.T) {
+	def := Definition{
+		Alarm:     alarm.Config{ID: "Lid", Severity: 300},
+		Source:    "Lid",
+		Condition: evaluator.Config{Kind: evaluator.Digital, OnDelay: 2 * time.Second},
+	}
+	r := replayAfterOutage(t, def, map[time.Duration]float64{5 * time.Second: 1, 15 * time.Second: 0})
+	var activated *alarm.Event
+	for i := range r.events {
+		if r.events[i].Kind == alarm.Activated {
+			activated = &r.events[i]
+		}
+	}
+	if activated == nil {
+		t.Fatalf("no alarm raised for a 10 s opening; events %v", r.kinds())
+	}
+	if want := time.Date(2026, 10, 1, 8, 0, 7, 0, time.UTC); !activated.Time.Equal(want) {
+		t.Errorf("activated at %v, want %v (opening + on-delay, device time)", activated.Time, want)
+	}
+}
+
+// TestReplayedBurstIsNotChatterIssue4 covers issue #4: three pulses 15 s
+// apart in device time, replayed together, are not chattering for a 5 s window.
+func TestReplayedBurstIsNotChatterIssue4(t *testing.T) {
+	def := Definition{
+		Alarm:     alarm.Config{ID: "P", Severity: 300, ChatterCount: 3, ChatterWindow: 5 * time.Second},
+		Source:    "P",
+		Condition: evaluator.Config{Kind: evaluator.Digital},
+	}
+	changes := map[time.Duration]float64{}
+	for i := 0; i < 3; i++ {
+		on := time.Duration(2+15*i) * time.Second
+		changes[on], changes[on+time.Second] = 1, 0
+	}
+	r := replayAfterOutage(t, def, changes)
+	n := 0
+	for _, k := range r.kinds() {
+		if k == alarm.ChatterStarted {
+			t.Fatalf("a replayed burst was flagged as chattering: %v", r.kinds())
+		}
+		if k == alarm.Activated {
+			n++
+		}
+	}
+	if n != 3 {
+		t.Errorf("%d activations, want 3: %v", n, r.kinds())
 	}
 }

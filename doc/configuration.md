@@ -77,7 +77,7 @@ in both files. See [conditions.md](conditions.md) and [alarm-model.md](alarm-mod
 | `-tick` | `1s` | longest wait between evaluations; delays, shelves and rates are evaluated exactly when due |
 | `-feed-wait` | `25s` | how long one change-feed request waits before it is renewed |
 | `-poll` | `1s` | how often linked tags are read from a database without a change feed; retry interval after a failed feed request |
-| `-source-time-skew` | `5s` | evaluate delays and rates in device time when it is within this of the server clock; `0` uses arrival time |
+| `-source-time-skew` | `5s` | evaluate delays and rates in device time when it is within this of the server clock, or later than the alarm's last evaluation (changes replayed after an outage); `0` uses arrival time |
 | `-user` | `hmi` | user recorded for tag commands that name none |
 | `-tags-port` | `8443` | honeycomb tag API (status and command tags); empty disables it |
 | `-api-port` | `8444` | beeguard API; empty disables it |

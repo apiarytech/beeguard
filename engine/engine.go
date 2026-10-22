@@ -82,18 +82,39 @@ type entry struct {
 	alarm  *alarm.Alarm
 	eval   *evaluator.Evaluator
 	evalAt time.Time // last evaluation time; evaluation never goes back in time
+	// held: the last sample had bad quality. The condition is held, so the
+	// entry's clock stands still until a good sample arrives: changes the
+	// field recorded during a feed outage, replayed afterwards, are then
+	// evaluated at their device times instead of all at their arrival.
+	held bool
 }
 
 // at returns the time to evaluate a sample at.
+//
+// With maxSkew set, a sample's device time is used when it is within maxSkew
+// of the clock. An older device time is also used when it is not before the
+// last evaluation: a change replayed late, after a feed outage, keeps its
+// time. Otherwise (no device time, a device clock that is wrong, or the
+// first sample of an alarm) the clock is used. A bad-quality sample does not
+// move the clock on. Evaluation time never goes backwards for an alarm.
 func (en *entry) at(s evaluator.Sample, now time.Time, maxSkew time.Duration) time.Time {
 	t := now
-	if maxSkew > 0 && !s.Time.IsZero() && s.Time.Sub(now).Abs() <= maxSkew {
-		t = s.Time
+	if maxSkew > 0 && !s.Time.IsZero() {
+		switch d := s.Time.Sub(now); {
+		case d.Abs() <= maxSkew:
+			t = s.Time
+		case d < 0 && !en.evalAt.IsZero() && !s.Time.Before(en.evalAt):
+			t = s.Time // replayed late, but after what was evaluated
+		}
+	}
+	if !s.Good && !en.evalAt.IsZero() && en.def.Condition.Kind != evaluator.BadQuality {
+		t = en.evalAt // bad quality holds the condition: keep the clock where it was
 	}
 	if t.Before(en.evalAt) {
 		t = en.evalAt
 	}
 	en.evalAt = t
+	en.held = !s.Good && en.def.Condition.Kind != evaluator.BadQuality
 	return t
 }
 
@@ -107,10 +128,12 @@ func (en *entry) nextDeadline() (time.Time, bool) {
 	return d, ok
 }
 
-// setCondition passes the evaluator's condition to the alarm and stamps the
-// resulting events with the time of the sample that caused them.
-func (en *entry) setCondition(now time.Time) []alarm.Event {
-	events := en.alarm.SetCondition(en.eval.Active(), now)
+// setCondition passes the evaluator's condition to the alarm at the
+// evaluation time at, so chatter detection sees the changes' own spacing,
+// and stamps the resulting events with the time of the sample that caused
+// them.
+func (en *entry) setCondition(at time.Time) []alarm.Event {
+	events := en.alarm.SetCondition(en.eval.Active(), at)
 	for i := range events {
 		events[i].SourceTime = en.eval.Last().Time
 	}
@@ -193,8 +216,20 @@ func (e *Engine) Process(source string, s evaluator.Sample) {
 	_ = e.run(func(now time.Time) ([]alarm.Event, error) {
 		var events []alarm.Event
 		for _, en := range e.bySource[source] {
-			if en.eval.Update(s, en.at(s, now, e.maxSkew)) {
-				events = append(events, en.setCondition(now)...)
+			at := en.at(s, now, e.maxSkew)
+			// A delay that came due before this sample expires at its own
+			// time first: between replayed changes no Tick ran at it.
+			for i := 0; i < 8; i++ {
+				d, ok := en.eval.NextDeadline()
+				if !ok || !d.Before(at) {
+					break
+				}
+				if en.eval.Tick(d) {
+					events = append(events, en.setCondition(d)...)
+				}
+			}
+			if en.eval.Update(s, at) {
+				events = append(events, en.setCondition(at)...)
 			}
 		}
 		return events, nil
@@ -207,11 +242,14 @@ func (e *Engine) Tick() {
 	_ = e.run(func(now time.Time) ([]alarm.Event, error) {
 		var events []alarm.Event
 		for _, en := range e.order {
-			if en.eval.Tick(now) {
-				events = append(events, en.setCondition(now)...)
-			}
-			if now.After(en.evalAt) {
-				en.evalAt = now
+			// A held entry's clock stands still (see entry.held).
+			if !en.held {
+				if en.eval.Tick(now) {
+					events = append(events, en.setCondition(now)...)
+				}
+				if now.After(en.evalAt) {
+					en.evalAt = now
+				}
 			}
 			events = append(events, en.alarm.Tick(now)...)
 		}

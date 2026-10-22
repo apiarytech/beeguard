@@ -443,6 +443,22 @@ that lasted 3 s in the field could still wait out a 2 s on-delay, and a burst
 would distort rates of change. The skew limit keeps a wrong device clock from
 distorting alarms.
 
+**Amended 2026-10-22 (issue #4).** Changes replayed after a feed outage are
+older than `maxSkew` by the time they arrive, so they all fell back to the
+server clock: a 10 s opening with a 2 s on-delay raised nothing, and a burst
+of pulses looked like chattering. Now:
+
+- a device timestamp older than `maxSkew` is still used when it is not before
+  the alarm's last evaluation (a wrong clock stays ignored, since its times
+  fall behind what was already evaluated, and an alarm's first sample still
+  needs a time within `maxSkew`);
+- a bad-quality sample does not move an alarm's clock on, and `Tick` leaves
+  it while the source's last sample is bad, except for a `bad_quality` alarm,
+  whose delays run on the clock;
+- a delay that came due between two replayed changes expires at its own time;
+- the alarm (and so chatter detection) is given the evaluation time, not the
+  arrival time.
+
 ## D-36. The engine is driven by deadlines, not a fixed tick
 
 **Decision.** Evaluators and alarms report their next deadline (delay expiry,
