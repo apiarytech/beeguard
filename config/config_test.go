@@ -110,3 +110,16 @@ func TestDefaultMaxShelve(t *testing.T) {
 		}
 	}
 }
+
+// TestTrailingDataIssue10 covers issue #10 (1): junk after the object is refused.
+func TestTrailingDataIssue10(t *testing.T) {
+	ok := `{"alarms": [{"id": "A", "source": "S", "kind": "digital"}]}`
+	for _, doc := range []string{ok + " garbage", ok + `{"alarms": []}`, ok + "]"} {
+		if _, err := ParseConfig(strings.NewReader(doc)); err == nil {
+			t.Errorf("accepted %q", doc)
+		}
+	}
+	if _, err := ParseConfig(strings.NewReader(ok + "\n\n  ")); err != nil {
+		t.Errorf("trailing white space refused: %v", err)
+	}
+}

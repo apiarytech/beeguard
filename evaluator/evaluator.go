@@ -24,6 +24,7 @@ package evaluator
 import (
 	"errors"
 	"fmt"
+	"math"
 	"time"
 )
 
@@ -163,7 +164,11 @@ func (e *Evaluator) NextDeadline() (deadline time.Time, ok bool) {
 }
 
 // Update evaluates a new sample at now and reports whether Active changed.
+// A NaN value counts as bad quality, for every kind of condition.
 func (e *Evaluator) Update(s Sample, now time.Time) bool {
+	if math.IsNaN(s.Value) {
+		s.Good = false
+	}
 	e.last, e.have = s, true
 	e.raw = e.detect(s, now)
 	return e.filter(now)

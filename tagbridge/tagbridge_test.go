@@ -505,3 +505,16 @@ func TestIsCommandTag(t *testing.T) {
 		}
 	}
 }
+
+// TestNegativeShelveMinutesIssue10 covers issue #10 (3): a negative
+// ShelveMinutes on a command tag is refused, as the beeguard API refuses it.
+func TestNegativeShelveMinutesIssue10(t *testing.T) {
+	f := setup(t)
+	cmd := f.bridge.CommandTag("Guard1.TempHigh")
+	f.set(t, cmd+".ShelveMinutes", plc.DINT(-5))
+	f.set(t, cmd+".Shelve", plc.BOOL(true))
+	eventually(t, "the error", func() bool { return strings.Contains(f.result(t, "Guard1.TempHigh"), "negative") })
+	if s, _ := f.eng.Status("Guard1.TempHigh"); s.Shelved {
+		t.Error("a negative ShelveMinutes shelved the alarm")
+	}
+}

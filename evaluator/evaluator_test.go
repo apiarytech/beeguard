@@ -11,6 +11,7 @@
 package evaluator
 
 import (
+	"math"
 	"testing"
 	"time"
 )
@@ -245,5 +246,31 @@ func TestNextDeadline(t *testing.T) {
 	r.Update(good(1), at(0))
 	if d, ok := r.NextDeadline(); !ok || !d.Equal(at(1000)) {
 		t.Fatalf("rate deadline = %v, %v", d, ok)
+	}
+}
+
+// TestNaNIsBadQualityIssue10 covers issue #10 (2): a good-quality NaN holds
+// the condition for every kind, as bad quality does.
+func TestNaNIsBadQualityIssue10(t *testing.T) {
+	t0 := time.Date(2026, 10, 1, 8, 0, 0, 0, time.UTC)
+	for _, kind := range []Kind{Digital, High, Low} {
+		e, err := New(Config{Kind: kind, Limit: 10})
+		if err != nil {
+			t.Fatal(err)
+		}
+		normal := 0.0
+		if kind == Low {
+			normal = 20
+		}
+		e.Update(Sample{Value: normal, Good: true, Time: t0}, t0)
+		e.Update(Sample{Value: math.NaN(), Good: true, Time: t0.Add(time.Second)}, t0.Add(time.Second))
+		if e.Active() {
+			t.Errorf("kind %v: a NaN raised the condition", kind)
+		}
+	}
+	e, _ := New(Config{Kind: BadQuality})
+	e.Update(Sample{Value: math.NaN(), Good: true, Time: t0}, t0)
+	if !e.Active() {
+		t.Error("a bad-quality alarm ignored a NaN")
 	}
 }

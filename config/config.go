@@ -36,6 +36,7 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -102,6 +103,21 @@ type Journal struct {
 	Retention time.Duration
 }
 
+// noTrailingData reports anything after the first JSON value: a file with
+// junk after its object, such as a second object pasted in, is refused
+// instead of silently ignoring the rest.
+func noTrailingData(dec *json.Decoder) error {
+	var extra json.RawMessage
+	switch err := dec.Decode(&extra); {
+	case errors.Is(err, io.EOF):
+		return nil
+	case err != nil:
+		return fmt.Errorf("after the configuration: %w", err)
+	default:
+		return errors.New("unexpected data after the configuration")
+	}
+}
+
 // ParseConfig reads an alarms file: the definitions and, under "journal",
 // the journal's settings:
 //
@@ -111,6 +127,9 @@ func ParseConfig(r io.Reader) (Config, error) {
 	dec := json.NewDecoder(r)
 	dec.DisallowUnknownFields()
 	if err := dec.Decode(&f); err != nil {
+		return Config{}, err
+	}
+	if err := noTrailingData(dec); err != nil {
 		return Config{}, err
 	}
 	var c Config

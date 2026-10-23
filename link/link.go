@@ -119,6 +119,15 @@ func Parse(r io.Reader) (Config, error) {
 	if err := dec.Decode(&cfg); err != nil {
 		return Config{}, err
 	}
+	// Anything after the object (junk, a second object) is refused.
+	var extra json.RawMessage
+	switch err := dec.Decode(&extra); {
+	case errors.Is(err, io.EOF):
+	case err != nil:
+		return Config{}, fmt.Errorf("after the configuration: %w", err)
+	default:
+		return Config{}, errors.New("unexpected data after the configuration")
+	}
 	return cfg, cfg.Validate()
 }
 

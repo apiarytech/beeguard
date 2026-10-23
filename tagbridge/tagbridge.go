@@ -577,6 +577,9 @@ func (b *Bridge) command(id string) {
 		if v, err := b.db.GetTagValue(tag + ".ShelveMinutes"); err == nil {
 			minutes, _ = v.(plc.DINT)
 		}
+		if minutes < 0 { // as the beeguard API refuses it
+			return errors.New("ShelveMinutes must not be negative")
+		}
 		var oneShot plc.BOOL
 		if v, err := b.db.GetTagValue(tag + ".OneShot"); err == nil {
 			oneShot, _ = v.(plc.BOOL)

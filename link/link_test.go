@@ -132,3 +132,10 @@ func TestApplyOverHTTPS(t *testing.T) {
 		t.Fatal("a wrong token was accepted")
 	}
 }
+
+// TestParseTrailingData: junk after the links object is refused (issue #10).
+func TestParseTrailingData(t *testing.T) {
+	if _, err := Parse(strings.NewReader(`{"databases": []} x`)); err == nil {
+		t.Error("accepted junk after the object")
+	}
+}
