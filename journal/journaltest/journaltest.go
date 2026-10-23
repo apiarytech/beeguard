@@ -71,10 +71,18 @@ func Run(t *testing.T, j journal.Journal) {
 	check(day, 2, 3, 4, 5)
 	day.Offset = 4
 	check(day, 6, 7)
+	// Bounds far outside the years int64 nanoseconds can hold (issue #9).
+	far := journal.Filter{Since: time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC), Until: time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC), Oldest: true, Limit: 2}
+	check(far, 0, 1)
+	check(journal.Filter{Since: time.Date(9999, 1, 1, 0, 0, 0, 0, time.UTC)})
+	check(journal.Filter{Until: time.Date(1000, 1, 1, 0, 0, 0, 0, time.UTC)})
 
 	p, ok := j.(journal.Purger)
 	if !ok {
 		return
+	}
+	if n, err := p.Purge(ctx, time.Date(1000, 1, 1, 0, 0, 0, 0, time.UTC)); err != nil || n != 0 {
+		t.Fatalf("purge before the year 1000: %d, %v; want 0", n, err)
 	}
 	n, err := p.Purge(ctx, t0.Add(5*time.Minute))
 	if err != nil || n != 5 {

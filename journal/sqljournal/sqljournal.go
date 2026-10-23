@@ -126,6 +126,25 @@ func nanos(t time.Time) int64 {
 	return t.UnixNano()
 }
 
+// The times int64 nanoseconds since 1970 can hold: about 1677 to 2262.
+var (
+	minNanoTime = time.Unix(0, math.MinInt64)
+	maxNanoTime = time.Unix(0, math.MaxInt64)
+)
+
+// boundNanos converts a filter bound to nanoseconds, clamping a time outside
+// the representable range to its ends. UnixNano is undefined there and
+// returns a wrapped value, so until=9999-12-31 matched nothing.
+func boundNanos(t time.Time) int64 {
+	switch {
+	case t.Before(minNanoTime):
+		return math.MinInt64
+	case t.After(maxNanoTime):
+		return math.MaxInt64
+	}
+	return t.UnixNano()
+}
+
 func fromNanos(n int64) time.Time {
 	if n == 0 {
 		return time.Time{}
@@ -169,10 +188,10 @@ func (j *Journal) Query(ctx context.Context, f journal.Filter) ([]alarm.Event, e
 		add("alarm = %s", f.Alarm)
 	}
 	if !f.Since.IsZero() {
-		add("event_time >= %s", f.Since.UnixNano())
+		add("event_time >= %s", boundNanos(f.Since))
 	}
 	if !f.Until.IsZero() {
-		add("event_time < %s", f.Until.UnixNano())
+		add("event_time < %s", boundNanos(f.Until))
 	}
 	if len(f.Kinds) > 0 {
 		in := make([]string, len(f.Kinds))
@@ -240,7 +259,7 @@ var _ journal.Purger = (*Journal)(nil)
 
 // Purge deletes the events recorded before before.
 func (j *Journal) Purge(ctx context.Context, before time.Time) (int64, error) {
-	res, err := j.db.ExecContext(ctx, "DELETE FROM "+Table+" WHERE event_time < "+j.placeholder(1), before.UnixNano())
+	res, err := j.db.ExecContext(ctx, "DELETE FROM "+Table+" WHERE event_time < "+j.placeholder(1), boundNanos(before))
 	if err != nil {
 		return 0, fmt.Errorf("sqljournal: purge: %w", err)
 	}
