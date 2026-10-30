@@ -13,7 +13,7 @@
 // out of service, chattering detection and alarm counting.
 //
 // It is the Go equivalent of the BG_ALM_DIG function block in
-// reference/digital_alarm.st, minus condition filtering (deadband and on/off
+// reference/BG_ALM_DIG.st, minus condition filtering (deadband and on/off
 // delays), which lives in the evaluator package. An Alarm is pure: it has no
 // clock, goroutines or I/O. Every method takes the current time and returns the
 // events it caused, and Tick must be called periodically so shelving expires.
