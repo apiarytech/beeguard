@@ -1,6 +1,6 @@
 module github.com/apiarytech/beeguard/examples/guard/field
 
-go 1.27.2
+go 1.27.3
 
 // The example builds against the beeguard in this repository.
 replace github.com/apiarytech/beeguard => ../../..
