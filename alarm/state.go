@@ -16,7 +16,7 @@ import (
 )
 
 // State is an alarm's ISA-18.2 state. Its numeric values match the STATE
-// output of the BG_ALM_DIG function block (reference/digital_alarm.st).
+// output of the BG_ALM_DIG function block (reference/BG_ALM_DIG.st).
 type State uint8
 
 const (

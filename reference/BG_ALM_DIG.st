@@ -120,39 +120,39 @@ VAR_OUTPUT
 	CFG_VERSION: REAL;
 END_VAR
 VAR
-	ALMSTATE: DINT;				// BASE STATE 0..5
-	NOW: DT;
-	RAWCOND: BOOL;
-	LASTGOODCOND: BOOL;
-	COND: BOOL;					// CONDITION AFTER ON/OFF DELAY
-	SHELVEPT: TIME;
-	SHELVEDONESHOT: BOOL;
-	SHELVEREJECTED: BOOL;
-	CHATTERACC: DINT;
+	almstate: DINT;				// BASE STATE 0..5
+	now: DT;
+	rawcond: BOOL;
+	lastgoodcond: BOOL;
+	cond: BOOL;					// CONDITION AFTER ON/OFF DELAY
+	shelvept: TIME;
+	shelvedoneshot: BOOL;
+	shelverejected: BOOL;
+	chatteracc: DINT;
 
-	ACKCMD: BOOL;
-	RESETCMD: BOOL;
-	DISABLECMD: BOOL;
-	ENABLECMD: BOOL;
-	SUPPRESSCMD: BOOL;
-	UNSUPPRESSCMD: BOOL;
-	SHELVECMD: BOOL;
-	UNSHELVECMD: BOOL;
+	ackcmd: BOOL;
+	resetcmd: BOOL;
+	disablecmd: BOOL;
+	enablecmd: BOOL;
+	suppresscmd: BOOL;
+	unsuppresscmd: BOOL;
+	shelvecmd: BOOL;
+	unshelvecmd: BOOL;
 
-	ON_TMR: TON;
-	OFF_TMR: TON;
-	SHELVE_TMR: TON;
-	CHATTER_TMR: TON;
-	COND_RISE: R_TRIG;
-	COND_FALL: F_TRIG;
-	PG_ACK_ONS: R_TRIG;
-	PG_RESET_ONS: R_TRIG;
-	PG_DISABLE_ONS: R_TRIG;
-	PG_ENABLE_ONS: R_TRIG;
-	PG_SUPPRESS_ONS: R_TRIG;
-	PG_UNSUPPRESS_ONS: R_TRIG;
-	PG_UNSHELVE_ONS: R_TRIG;
-	COUNTRESET_ONS: R_TRIG;
+	on_tmr: TON;
+	off_tmr: TON;
+	shelve_tmr: TON;
+	chatter_tmr: TON;
+	cond_rise: R_TRIG;
+	cond_fall: F_TRIG;
+	pg_ack_ons: R_TRIG;
+	pg_reset_ons: R_TRIG;
+	pg_disable_ons: R_TRIG;
+	pg_enable_ons: R_TRIG;
+	pg_suppress_ons: R_TRIG;
+	pg_unsuppress_ons: R_TRIG;
+	pg_unshelve_ons: R_TRIG;
+	countreset_ons: R_TRIG;
 END_VAR
 VAR CONSTANT
 	ST_NORMAL: DINT := 0;
@@ -182,9 +182,9 @@ IF NOT IN_ENABLE THEN
 END_IF
 
 IF CFG_USE_SRC_TIME THEN
-	NOW := IN_SRC_TIME;
+	now := IN_SRC_TIME;
 ELSE
-	NOW := IN_CLOCK;
+	now := IN_CLOCK;
 END_IF
 
 (*===========================================================================
@@ -209,67 +209,67 @@ END_IF
 (*===========================================================================
 CONDITION - Invert, hold on bad quality, then apply the on-delay and off-delay
 ===========================================================================*)
-RAWCOND := IN_SIGNAL XOR CFG_INVERT;
+rawcond := IN_SIGNAL XOR CFG_INVERT;
 STS_IN_FAULT := IN_FAULT;
 IF IN_FAULT THEN
-	RAWCOND := LASTGOODCOND;	// BAD DATA MUST NOT RAISE OR CLEAR THE ALARM
+	rawcond := lastgoodcond;	// BAD DATA MUST NOT RAISE OR CLEAR THE ALARM
 ELSE
-	LASTGOODCOND := RAWCOND;
+	lastgoodcond := rawcond;
 END_IF
 
-ON_TMR(IN := RAWCOND AND NOT COND, PT := DINT_TO_TIME(MAX(CFG_ON_DELAY_MS, 0)));
-OFF_TMR(IN := NOT RAWCOND AND COND, PT := DINT_TO_TIME(MAX(CFG_OFF_DELAY_MS, 0)));
-IF ON_TMR.Q THEN
-	COND := TRUE;
-ELSIF OFF_TMR.Q THEN
-	COND := FALSE;
+on_tmr(IN := rawcond AND NOT cond, PT := DINT_TO_TIME(MAX(CFG_ON_DELAY_MS, 0)));
+off_tmr(IN := NOT rawcond AND cond, PT := DINT_TO_TIME(MAX(CFG_OFF_DELAY_MS, 0)));
+IF on_tmr.Q THEN
+	cond := TRUE;
+ELSIF off_tmr.Q THEN
+	cond := FALSE;
 END_IF
-VAL_ON_DELAY_MS := TIME_TO_DINT(ON_TMR.ET);
-STS_COND := COND;
-COND_RISE(CLK := COND);
-COND_FALL(CLK := COND);
+VAL_ON_DELAY_MS := TIME_TO_DINT(on_tmr.ET);
+STS_COND := cond;
+cond_rise(CLK := cond);
+cond_fall(CLK := cond);
 
 (*===========================================================================
 REQUESTS - Operator one-shots and logic rising edges
 ===========================================================================*)
-PG_ACK_ONS(CLK := CMD_PG_ACK);
-PG_RESET_ONS(CLK := CMD_PG_RESET);
-PG_DISABLE_ONS(CLK := CMD_PG_DISABLE);
-PG_ENABLE_ONS(CLK := CMD_PG_ENABLE);
-PG_SUPPRESS_ONS(CLK := CMD_PG_SUPPRESS);
-PG_UNSUPPRESS_ONS(CLK := CMD_PG_UNSUPPRESS);
-PG_UNSHELVE_ONS(CLK := CMD_PG_UNSHELVE);
+pg_ack_ons(CLK := CMD_PG_ACK);
+pg_reset_ons(CLK := CMD_PG_RESET);
+pg_disable_ons(CLK := CMD_PG_DISABLE);
+pg_enable_ons(CLK := CMD_PG_ENABLE);
+pg_suppress_ons(CLK := CMD_PG_SUPPRESS);
+pg_unsuppress_ons(CLK := CMD_PG_UNSUPPRESS);
+pg_unshelve_ons(CLK := CMD_PG_UNSHELVE);
 
-ACKCMD := CMD_OP_ACK OR PG_ACK_ONS.Q;
-RESETCMD := CMD_OP_RESET OR PG_RESET_ONS.Q;
-DISABLECMD := CMD_OP_DISABLE OR PG_DISABLE_ONS.Q;
-ENABLECMD := CMD_OP_ENABLE OR PG_ENABLE_ONS.Q;
-SUPPRESSCMD := CMD_OP_SUPPRESS OR PG_SUPPRESS_ONS.Q;
-UNSUPPRESSCMD := CMD_OP_UNSUPPRESS OR PG_UNSUPPRESS_ONS.Q;
-SHELVECMD := CMD_OP_SHELVE;
-UNSHELVECMD := CMD_OP_UNSHELVE OR PG_UNSHELVE_ONS.Q;
+ackcmd := CMD_OP_ACK OR pg_ack_ons.Q;
+resetcmd := CMD_OP_RESET OR pg_reset_ons.Q;
+disablecmd := CMD_OP_DISABLE OR pg_disable_ons.Q;
+enablecmd := CMD_OP_ENABLE OR pg_enable_ons.Q;
+suppresscmd := CMD_OP_SUPPRESS OR pg_suppress_ons.Q;
+unsuppresscmd := CMD_OP_UNSUPPRESS OR pg_unsuppress_ons.Q;
+shelvecmd := CMD_OP_SHELVE;
+unshelvecmd := CMD_OP_UNSHELVE OR pg_unshelve_ons.Q;
 
 (*===========================================================================
 OUT OF SERVICE (ISA H) - Supersedes shelving
 ===========================================================================*)
-IF DISABLECMD AND NOT STS_DISABLED THEN
+IF disablecmd AND NOT STS_DISABLED THEN
 	STS_DISABLED := TRUE;
 	IF STS_SHELVED THEN
 		STS_SHELVED := FALSE;
-		TS_UNSHELVE := NOW;
+		TS_UNSHELVE := now;
 	END_IF
 END_IF
-IF ENABLECMD THEN
+IF enablecmd THEN
 	STS_DISABLED := FALSE;
 END_IF
 
 (*===========================================================================
 SUPPRESSED BY DESIGN (ISA G)
 ===========================================================================*)
-IF SUPPRESSCMD THEN
+IF suppresscmd THEN
 	STS_SUPPRESSED := TRUE;
 END_IF
-IF UNSUPPRESSCMD THEN
+IF unsuppresscmd THEN
 	STS_SUPPRESSED := FALSE;
 END_IF
 
@@ -277,33 +277,33 @@ END_IF
 SHELVING (ISA F) - Operator only, always time-limited by CFG_SHELVE_MAX.
 A shelve request while shelved restarts the timer with the new duration.
 ===========================================================================*)
-IF SHELVECMD THEN
-	IF STS_DISABLED OR CFG_SHELVE_MAX = T#0S OR (CMD_SHELVE_ONESHOT AND NOT COND) THEN
-		SHELVEREJECTED := TRUE;
+IF shelvecmd THEN
+	IF STS_DISABLED OR CFG_SHELVE_MAX = T#0S OR (CMD_SHELVE_ONESHOT AND NOT cond) THEN
+		shelverejected := TRUE;
 	ELSE
 		IF CMD_SHELVE_TIME = T#0S OR CMD_SHELVE_TIME > CFG_SHELVE_MAX THEN
-			SHELVEPT := CFG_SHELVE_MAX;
+			shelvept := CFG_SHELVE_MAX;
 		ELSE
-			SHELVEPT := CMD_SHELVE_TIME;
+			shelvept := CMD_SHELVE_TIME;
 		END_IF
 		STS_SHELVED := TRUE;
-		SHELVEDONESHOT := CMD_SHELVE_ONESHOT;
-		SHELVEREJECTED := FALSE;
-		TS_SHELVE := NOW;
-		TS_SHELVE_EXPIRY := ADD_DT_TIME(NOW, SHELVEPT);
-		SHELVE_TMR(IN := FALSE);
+		shelvedoneshot := CMD_SHELVE_ONESHOT;
+		shelverejected := FALSE;
+		TS_SHELVE := now;
+		TS_SHELVE_EXPIRY := ADD_DT_TIME(now, shelvept);
+		shelve_tmr(IN := FALSE);
 	END_IF
 END_IF
 
-SHELVE_TMR(IN := STS_SHELVED, PT := SHELVEPT);
-IF STS_SHELVED AND (UNSHELVECMD OR SHELVE_TMR.Q OR (SHELVEDONESHOT AND COND_FALL.Q)) THEN
+shelve_tmr(IN := STS_SHELVED, PT := shelvept);
+IF STS_SHELVED AND (unshelvecmd OR shelve_tmr.Q OR (shelvedoneshot AND cond_fall.Q)) THEN
 	STS_SHELVED := FALSE;
-	TS_UNSHELVE := NOW;
-	SHELVE_TMR(IN := FALSE);
+	TS_UNSHELVE := now;
+	shelve_tmr(IN := FALSE);
 END_IF
 
 IF STS_SHELVED THEN
-	VAL_SHELVE_LEFT := SHELVEPT - SHELVE_TMR.ET;
+	VAL_SHELVE_LEFT := shelvept - shelve_tmr.ET;
 ELSE
 	VAL_SHELVE_LEFT := T#0S;
 END_IF
@@ -314,56 +314,56 @@ While shelved, suppressed or out of service the alarm is held at NORMAL, so an
 active condition re-annunciates as ACTIVE_UNACK when the alarm is returned.
 ===========================================================================*)
 IF STS_DISABLED OR STS_SUPPRESSED OR STS_SHELVED THEN
-	ALMSTATE := ST_NORMAL;
+	almstate := ST_NORMAL;
 ELSE
 	// CONDITION CHANGES
-	CASE ALMSTATE OF
+	CASE almstate OF
 	ST_NORMAL, ST_RTN_UNACK, ST_LATCHED_UNACK, ST_LATCHED_ACK:
-		IF COND THEN
-			ALMSTATE := ST_ACTIVE_UNACK;
+		IF cond THEN
+			almstate := ST_ACTIVE_UNACK;
 			VAL_COUNT := VAL_COUNT + 1;
-			TS_ALM := NOW;
+			TS_ALM := now;
 		END_IF
 	ST_ACTIVE_UNACK:
-		IF NOT COND THEN
-			TS_RTN := NOW;
+		IF NOT cond THEN
+			TS_RTN := now;
 			IF CFG_LATCH THEN
-				ALMSTATE := ST_LATCHED_UNACK;
+				almstate := ST_LATCHED_UNACK;
 			ELSE
-				ALMSTATE := ST_RTN_UNACK;
+				almstate := ST_RTN_UNACK;
 			END_IF
 		END_IF
 	ST_ACTIVE_ACK:
-		IF NOT COND THEN
-			TS_RTN := NOW;
+		IF NOT cond THEN
+			TS_RTN := now;
 			IF CFG_LATCH THEN
-				ALMSTATE := ST_LATCHED_ACK;
+				almstate := ST_LATCHED_ACK;
 			ELSE
-				ALMSTATE := ST_NORMAL;
+				almstate := ST_NORMAL;
 			END_IF
 		END_IF
 	END_CASE
 
 	// ACKNOWLEDGE - IMPLICIT WHEN NO ACKNOWLEDGEMENT IS REQUIRED
-	IF ACKCMD OR NOT CFG_ACK_REQ THEN
-		CASE ALMSTATE OF
+	IF ackcmd OR NOT CFG_ACK_REQ THEN
+		CASE almstate OF
 		ST_ACTIVE_UNACK:
-			ALMSTATE := ST_ACTIVE_ACK;
-			TS_ACK := NOW;
+			almstate := ST_ACTIVE_ACK;
+			TS_ACK := now;
 		ST_RTN_UNACK:
-			ALMSTATE := ST_NORMAL;
-			TS_ACK := NOW;
+			almstate := ST_NORMAL;
+			TS_ACK := now;
 		ST_LATCHED_UNACK:
-			ALMSTATE := ST_LATCHED_ACK;
-			TS_ACK := NOW;
+			almstate := ST_LATCHED_ACK;
+			TS_ACK := now;
 		END_CASE
 	END_IF
 
 	// RESET - ONLY A LATCHED ALARM THAT IS BACK TO NORMAL AND ACKNOWLEDGED.
 	// AN ACK AND RESET IN THE SAME SCAN CLEARS A LATCHED_UNACK ALARM.
-	IF RESETCMD AND ALMSTATE = ST_LATCHED_ACK THEN
-		ALMSTATE := ST_NORMAL;
-		TS_RESET := NOW;
+	IF resetcmd AND almstate = ST_LATCHED_ACK THEN
+		almstate := ST_NORMAL;
+		TS_RESET := now;
 	END_IF
 END_IF
 
@@ -372,38 +372,38 @@ CHATTER - CFG_CHATTER_COUNT or more activations within one CFG_CHATTER_WINDOW.
 Cleared at the end of a window with fewer activations.
 ===========================================================================*)
 IF CFG_CHATTER_COUNT > 0 THEN
-	CHATTER_TMR(IN := NOT CHATTER_TMR.Q, PT := CFG_CHATTER_WINDOW);
-	IF COND_RISE.Q THEN
-		CHATTERACC := CHATTERACC + 1;
+	chatter_tmr(IN := NOT chatter_tmr.Q, PT := CFG_CHATTER_WINDOW);
+	IF cond_rise.Q THEN
+		chatteracc := chatteracc + 1;
 	END_IF
-	IF CHATTERACC >= CFG_CHATTER_COUNT THEN
+	IF chatteracc >= CFG_CHATTER_COUNT THEN
 		STS_CHATTER := TRUE;
 	END_IF
-	IF CHATTER_TMR.Q THEN
-		STS_CHATTER := CHATTERACC >= CFG_CHATTER_COUNT;
-		CHATTERACC := 0;
+	IF chatter_tmr.Q THEN
+		STS_CHATTER := chatteracc >= CFG_CHATTER_COUNT;
+		chatteracc := 0;
 	END_IF
 ELSE
-	CHATTER_TMR(IN := FALSE);
-	CHATTERACC := 0;
+	chatter_tmr(IN := FALSE);
+	chatteracc := 0;
 	STS_CHATTER := FALSE;
 END_IF
 
 (*===========================================================================
 ALARM COUNT
 ===========================================================================*)
-COUNTRESET_ONS(CLK := CMD_COUNT_RESET);
-IF COUNTRESET_ONS.Q THEN
+countreset_ons(CLK := CMD_COUNT_RESET);
+IF countreset_ons.Q THEN
 	VAL_COUNT := 0;
-	TS_COUNT_RESET := NOW;
+	TS_COUNT_RESET := now;
 END_IF
 
 (*===========================================================================
 OUTPUT UPDATES
 ===========================================================================*)
-STS_ALM := ALMSTATE = ST_ACTIVE_UNACK OR ALMSTATE = ST_ACTIVE_ACK
-	OR ALMSTATE = ST_LATCHED_UNACK OR ALMSTATE = ST_LATCHED_ACK;
-STS_UNACKED := ALMSTATE = ST_ACTIVE_UNACK OR ALMSTATE = ST_RTN_UNACK OR ALMSTATE = ST_LATCHED_UNACK;
+STS_ALM := almstate = ST_ACTIVE_UNACK OR almstate = ST_ACTIVE_ACK
+	OR almstate = ST_LATCHED_UNACK OR almstate = ST_LATCHED_ACK;
+STS_UNACKED := almstate = ST_ACTIVE_UNACK OR almstate = ST_RTN_UNACK OR almstate = ST_LATCHED_UNACK;
 STS_ACKED := NOT STS_UNACKED;
 STS_ALM_UNACK := STS_ALM AND STS_UNACKED;
 
@@ -414,12 +414,12 @@ ELSIF STS_SUPPRESSED THEN
 ELSIF STS_SHELVED THEN
 	VAL_STATE := ST_SHELVED;
 ELSE
-	VAL_STATE := ALMSTATE;
+	VAL_STATE := almstate;
 END_IF
 
 VAL_DIAG.0 := STS_CFG_FAULT;
 VAL_DIAG.1 := IN_FAULT;
-VAL_DIAG.5 := SHELVEREJECTED;
+VAL_DIAG.5 := shelverejected;
 VAL_DIAG.6 := STS_CHATTER;
 
 (*===========================================================================

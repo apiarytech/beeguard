@@ -35,7 +35,7 @@ alarm priorities.
 
 ## D-3. The Structured Text block is the specification
 
-**Decision.** The `BG_ALM_DIG` function block ([reference/digital_alarm.st](../reference/digital_alarm.st))
+**Decision.** The `BG_ALM_DIG` function block ([reference/BG_ALM_DIG.st](../reference/BG_ALM_DIG.st))
 is the reference behaviour, and `alarm.State` uses its `VAL_STATE` numbering
 (0 NORMAL … 8 OUT_OF_SERVICE).
 
@@ -527,7 +527,7 @@ as part of the project, so the origin of each part can be shown later.
 | ANSI/ISA-18.2 and IEC 62682 | The alarm states A–H, acknowledge, latching, shelving, suppression by design, out of service | Concepts implemented from the published model. No text, tables or figures copied. |
 | ISA-TR18.2.3 and EEMUA 191 | Filtering order (deadband, on-delay, off-delay); typical starting deadbands and delays; chattering as a nuisance-alarm indicator | The numeric starting values are cited as facts with their source. No text or tables copied. |
 | Rockwell Automation public instruction reference for its digital and analog alarm instructions (read online, Studio 5000 v38 documentation) | Checking that the planned behaviour covers what industrial users expect from a controller-based alarm: which requests exist, when they take effect, which time stamps are kept | Read for reference only. No code, text or figures copied. beeguard's names, structure and several behaviours differ deliberately (D-6, D-11, D-27, and configuration errors refuse to start instead of setting fault bits). |
-| The author's own v2 function blocks (`archive/`, `reference/analog_v2.1.st`) | Starting point for the Structured Text and the analog-input block | Owned by the author. Reviewed, corrected and rewritten as v3. |
+| The author's own v2 function blocks (`archive/`, `reference/FB_CM_ANALOG.st`) | Starting point for the Structured Text and the analog-input block | Owned by the author. Reviewed, corrected and rewritten as v3. |
 | Open-source components (see [NOTICE.md](../NOTICE.md)) | Tag database; SQLite in the optional SQLite build; device drivers in the field example | Used as libraries under their licenses. No code copied into beeguard. |
 | Public projects surveyed for the design (Prometheus Alertmanager, gopcua, PyAutomation, EVA ICS) | Confirming no Go ISA-18.2 library exists; general ideas such as silences and inhibition | Read for comparison only. No code used. |
 

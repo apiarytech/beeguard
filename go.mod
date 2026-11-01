@@ -3,8 +3,8 @@ module github.com/apiarytech/beeguard
 go 1.27.3
 
 require (
-	github.com/apiarytech/honeycomb v0.2.0
-	github.com/apiarytech/royaljelly v0.3.3
+	github.com/apiarytech/honeycomb v0.3.0
+	github.com/apiarytech/royaljelly v0.3.4
 	modernc.org/sqlite v1.60.1
 )
 

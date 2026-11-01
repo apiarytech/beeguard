@@ -2,7 +2,7 @@
 
 Package [alarm](../alarm/) implements one alarm's ISA-18.2 / IEC 62682 state
 model. It is the Go port of the `BG_ALM_DIG` function block in
-[reference/digital_alarm.st](../reference/digital_alarm.st), without the
+[reference/BG_ALM_DIG.st](../reference/BG_ALM_DIG.st), without the
 condition filtering, which lives in the [evaluator](conditions.md).
 
 ## States

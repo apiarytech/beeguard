@@ -1,7 +1,7 @@
 FUNCTION_BLOCK AOI_CM_ALMD
 (*==========================================================================
 v2.0 of the digital alarm block, kept as a historical record. It was replaced
-by v3.0, now BG_ALM_DIG in reference/digital_alarm.st. The code below is the
+by v3.0, now BG_ALM_DIG in reference/BG_ALM_DIG.st. The code below is the
 original v2.0 and is not maintained; its block and parameter names are the
 originals and are not used anywhere else.
 

@@ -1,4 +1,4 @@
-# beeguard - ISA-18.2 Alarm & Event Server in Go
+# <img src="doc/icon/png/beeguard-512.png" alt="" width="48" align="center"> BeeGuard: Alarm & Event Server in Go!
 
 `beeguard` is an alarm and event server for operational technology, built on
 [honeycomb](https://github.com/apiarytech/honeycomb) tag databases. It links

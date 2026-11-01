@@ -1,7 +1,7 @@
-github.com/apiarytech/honeycomb v0.2.0 h1:iA8nJ7j8BSTcZIU/CyYO97m5ykYtGFKWvyPH1UuPvxU=
-github.com/apiarytech/honeycomb v0.2.0/go.mod h1:/a3L6jIOCOAfYTr5iEUuecijGRuJedofubKPIfjlPJw=
-github.com/apiarytech/royaljelly v0.3.3 h1:znFLtoeAio+ReM14Hdg3UhVBnm5mf8uNi+ONpkOf+mc=
-github.com/apiarytech/royaljelly v0.3.3/go.mod h1:btdgGAeb/abudrywsv5lYjflnyX3LcAOrNLLRF6b3iA=
+github.com/apiarytech/honeycomb v0.3.0 h1:fsr6DRjXVBkH5jU0Q8JLjw84eFzkfKlWykdPrZM7Pzg=
+github.com/apiarytech/honeycomb v0.3.0/go.mod h1:E2BES6OvLZChFbARse1aWjMN5TtZ/eU2whfqXxLhhgM=
+github.com/apiarytech/royaljelly v0.3.4 h1:a2hXdlDh+iK64LNbfjTqbeu5sVbeU7qZ50eGsWsUcEs=
+github.com/apiarytech/royaljelly v0.3.4/go.mod h1:btdgGAeb/abudrywsv5lYjflnyX3LcAOrNLLRF6b3iA=
 github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY=
 github.com/dustin/go-humanize v1.0.1/go.mod h1:Mu1zIs6XwVuF/gI1OepvI0qD18qycQx+mFykh5fBlto=
 github.com/google/pprof v0.0.0-20260802141513-ef3492d7dac3 h1:LMLX+LgTNWpfvCBdFebv6EsYotImrt/Ppc5cXIriCSo=
