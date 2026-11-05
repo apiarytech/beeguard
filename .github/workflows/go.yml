@@ -156,7 +156,7 @@ jobs:
       - name: Set up TinyGo
         uses: acifani/setup-tinygo@v3
         with:
-          tinygo-version: '0.43.0'
+          tinygo-version: '0.44.0'
 
       # The alarm model, engine, evaluator, journal interface and API run
       # under TinyGo. tagbridge and link do not: they import honeycomb, whose
