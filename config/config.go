@@ -32,6 +32,10 @@
 //
 // "journal" sets how the journal is kept: {"retention": "8760h"} deletes
 // events older than a year (ParseConfig).
+//
+// "statusTags" says whether a host serves each alarm's status tag
+// (tagbridge's ALM_<id>) as a tag of its own, for HMIs, other programs and
+// the history; true when absent. tagbridge keeps the tags either way.
 package config
 
 import (
@@ -82,8 +86,9 @@ type fileJournal struct {
 }
 
 type file struct {
-	Alarms  []fileAlarm  `json:"alarms"`
-	Journal *fileJournal `json:"journal,omitempty"`
+	Alarms     []fileAlarm  `json:"alarms"`
+	Journal    *fileJournal `json:"journal,omitempty"`
+	StatusTags *bool        `json:"statusTags,omitempty"`
 }
 
 // FileType is the Go type of an alarms file, for tools that describe the
@@ -94,6 +99,9 @@ func FileType() reflect.Type { return reflect.TypeOf(file{}) }
 type Config struct {
 	Alarms  []engine.Definition
 	Journal Journal
+	// StatusTags: the host serves each alarm's status tag as a tag of its
+	// own. True unless the file says "statusTags": false.
+	StatusTags bool
 }
 
 // Journal is how the journal is kept.
@@ -132,7 +140,7 @@ func ParseConfig(r io.Reader) (Config, error) {
 	if err := noTrailingData(dec); err != nil {
 		return Config{}, err
 	}
-	var c Config
+	c := Config{StatusTags: f.StatusTags == nil || *f.StatusTags}
 	if f.Journal != nil && f.Journal.Retention != "" {
 		d, err := time.ParseDuration(f.Journal.Retention)
 		if err != nil || d < 0 {
