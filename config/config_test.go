@@ -94,6 +94,18 @@ func TestParseConfigJournal(t *testing.T) {
 	}
 }
 
+// statusTags is true unless the file turns it off.
+func TestParseConfigStatusTags(t *testing.T) {
+	for in, want := range map[string]bool{
+		`{"alarms": []}`: true, `{"alarms": [], "statusTags": true}`: true, `{"alarms": [], "statusTags": false}`: false,
+	} {
+		c, err := ParseConfig(strings.NewReader(in))
+		if err != nil || c.StatusTags != want {
+			t.Errorf("%s: %v %v, want %v", in, c.StatusTags, err, want)
+		}
+	}
+}
+
 // An alarm without a longest shelving may be shelved a day; "0s" forbids it
 // (D-38).
 func TestDefaultMaxShelve(t *testing.T) {

@@ -28,6 +28,9 @@ third-party modules. Design and structure are documented in [doc/](doc/README.md
   `-tags sqlite`, with the device time of the value behind each event,
   retention by age (`"journal": {"retention": "8760h"}` in the alarms file)
   and paging from the oldest entry, to read a whole day for a report.
+- **Status tags**: tagbridge keeps each alarm's status (`ALM_<id>`); the
+  alarms file's `"statusTags"` (true when absent) tells a host whether to
+  serve them as tags of its own.
 - **APIs**: a transport-neutral Go service interface ([api](api/)) ready to be
   wrapped as a microservice, served over HTTPS/JSON ([api/httpapi](api/httpapi/)).
 - **Logging** through the standard library's `log/slog`, as text or JSON.
