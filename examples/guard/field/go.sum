@@ -2,10 +2,10 @@ github.com/ajankovic/xdiff v0.0.1 h1:V1cj8t5xwYzm6ZGPqPOlAc9AIajXuTEn41D/1MJBWMM
 github.com/ajankovic/xdiff v0.0.1/go.mod h1:SUmEZ67uB97I0zkiuQ+lb+LOms9ipn8X+p+2RdJV710=
 github.com/apache/plc4x/plc4go v0.0.0-20261012073005-2b1095c45dbc h1:IJX/53Woz6Zq6Vsi3eG+XdpsxMmufEsbVGmW+vEvmTc=
 github.com/apache/plc4x/plc4go v0.0.0-20261012073005-2b1095c45dbc/go.mod h1:Lpg5fCeGVFVPpepXfN8sqOpzkSog8mkM7aHsNIPsDCo=
-github.com/apiarytech/honeycomb v0.3.0 h1:fsr6DRjXVBkH5jU0Q8JLjw84eFzkfKlWykdPrZM7Pzg=
-github.com/apiarytech/honeycomb v0.3.0/go.mod h1:E2BES6OvLZChFbARse1aWjMN5TtZ/eU2whfqXxLhhgM=
-github.com/apiarytech/honeycomb/connectors/plc4x v0.3.0 h1:uKUOReVjwznuhL4tk6Z3I+0qQigyPI0GKo4CaKpS0Hs=
-github.com/apiarytech/honeycomb/connectors/plc4x v0.3.0/go.mod h1:GV7hVpEkeJiDoex1AMle7UZikGGBEQYsM1LQ7MaUrFY=
+github.com/apiarytech/honeycomb v0.4.0 h1:7XRZaLw8pkQnZ12Lk/x64rpEpeff0N6PViRol2odlBg=
+github.com/apiarytech/honeycomb v0.4.0/go.mod h1:y0dvju29/j9umwtTgh7WM0CaN2oAx0UAu5NEHl6ijQs=
+github.com/apiarytech/honeycomb/connectors/plc4x v0.6.0 h1:QqvmckcjcNS1MNrmOzvM0hACzl5O9F19rt6UhNys/u4=
+github.com/apiarytech/honeycomb/connectors/plc4x v0.6.0/go.mod h1:mEorIe5/2CUMT7dC8TDDHIHU1Yx2wdErvGWXMxqNEW4=
 github.com/apiarytech/royaljelly v0.4.0 h1:GUKWj+HmOYQ8NvmwUK4C9JePo/KFcgXVAqAu21knXwQ=
 github.com/apiarytech/royaljelly v0.4.0/go.mod h1:btdgGAeb/abudrywsv5lYjflnyX3LcAOrNLLRF6b3iA=
 github.com/fatih/color v1.19.0 h1:Zp3PiM21/9Ld6FzSKyL5c/BULoe/ONr9KlbYVOfG8+w=

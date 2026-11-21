@@ -7,8 +7,8 @@ replace github.com/apiarytech/beeguard => ../../..
 
 require (
 	github.com/apiarytech/beeguard v0.0.0-00010101000000-000000000000
-	github.com/apiarytech/honeycomb v0.3.0
-	github.com/apiarytech/honeycomb/connectors/plc4x v0.3.0
+	github.com/apiarytech/honeycomb v0.4.0
+	github.com/apiarytech/honeycomb/connectors/plc4x v0.6.0
 	github.com/rs/zerolog v1.35.1
 )
 
