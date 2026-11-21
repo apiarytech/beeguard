@@ -20,7 +20,7 @@ Full texts: [THIRD_PARTY_LICENSES.txt](THIRD_PARTY_LICENSES.txt).
 | Component | Version | License |
 |---|---|---|
 | github.com/apiarytech/honeycomb | development checkout | GPLv3 or commercial (same author) |
-| github.com/apiarytech/royaljelly | v0.1.0-beta1 | GPLv2 or later, or commercial (same author) |
+| github.com/apiarytech/royaljelly | v0.4.0 | GPLv3 or later, or commercial (same author) |
 
 Everything else in the default build comes from the Go standard library.
 

@@ -281,7 +281,7 @@ version listed).
 | Component | Version | License |
 |---|---|---|
 | github.com/apiarytech/honeycomb (and connectors/plc4x) | development checkout | GPLv3 or commercial (same author) |
-| github.com/apiarytech/royaljelly | v0.1.0-beta1 | GPLv2 or later, or commercial (same author) |
+| github.com/apiarytech/royaljelly | v0.4.0 | GPLv3 or later, or commercial (same author) |
 | github.com/apache/plc4x/plc4go | v0.0.0-20260930074747-b878affa2d7b | Apache License 2.0 |
 | charm.land/log/v2 | v2.0.0 | MIT |
 | charm.land/lipgloss/v2 | v2.0.4 | MIT |
@@ -404,23 +404,23 @@ The full GPL text is in the gpl-*.md file of the github.com/apiarytech/honeycomb
 
 ------------------------------------------------------------------------
 5. Component Name: github.com/apiarytech/royaljelly
-   Version: v0.1.0-beta1
+   Version: v0.4.0
    Project URL: https://github.com/apiarytech/royaljelly
-   License Type: Dual license: GPLv2 or later, or commercial
+   License Type: Dual license: GPLv3 or later, or commercial
 ------------------------------------------------------------------------
 # Dual Licensing
 
-This project, royaljelly, is dual-licensed. You may use it under the terms of either the GNU General Public License version 2 (GPLv2) or a commercial license.
+This project, royaljelly, is dual-licensed. You may use it under the terms of either the GNU General Public License version 3 (GPLv3) or a commercial license.
 
-## GPLv2
+## GPLv3
 
-This project, royaljelly, can be used under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version. The full text of the GPLv2 is available in the `gpl-2.0.md` file.
+This project, royaljelly, can be used under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version. The full text of the GPLv3 is available in the `gpl-3.0.md` file.
 
 This is a good choice if you are developing open source software and want to share your work with the community.
 
 ## Commercial License
 
-If you wish to use this software, royaljelly, in a proprietary application or otherwise do not wish to be bound by the terms of the GPLv2, you must purchase a commercial license. Please contact the author for more information on obtaining a commercial license.
+If you wish to use this software, royaljelly, in a proprietary application or otherwise do not wish to be bound by the terms of the GPLv3, you must purchase a commercial license. Please contact the author for more information on obtaining a commercial license.
 
 The full GPL text is in the gpl-*.md file of the github.com/apiarytech/royaljelly repository.
 
