@@ -14,7 +14,7 @@ require (
 
 require (
 	github.com/apache/plc4x/plc4go v0.0.0-20261012073005-2b1095c45dbc // indirect
-	github.com/apiarytech/royaljelly v0.3.4 // indirect
+	github.com/apiarytech/royaljelly v0.4.0 // indirect
 	github.com/fatih/color v1.19.0 // indirect
 	github.com/mattn/go-colorable v0.1.15 // indirect
 	github.com/mattn/go-isatty v0.0.24 // indirect
