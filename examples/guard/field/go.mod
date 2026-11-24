@@ -8,7 +8,7 @@ replace github.com/apiarytech/beeguard => ../../..
 require (
 	github.com/apiarytech/beeguard v0.0.0-00010101000000-000000000000
 	github.com/apiarytech/honeycomb v0.4.0
-	github.com/apiarytech/honeycomb/connectors/plc4x v0.6.0
+	github.com/apiarytech/honeycomb/connectors/plc4x v0.9.0
 	github.com/rs/zerolog v1.35.1
 )
 
@@ -18,6 +18,9 @@ require (
 	github.com/fatih/color v1.19.0 // indirect
 	github.com/mattn/go-colorable v0.1.15 // indirect
 	github.com/mattn/go-isatty v0.0.24 // indirect
-	golang.org/x/sys v0.48.0 // indirect
-	golang.org/x/text v0.42.0 // indirect
+	golang.org/x/net v0.62.0 // indirect
+	golang.org/x/sys v0.50.0 // indirect
+	golang.org/x/text v0.44.0 // indirect
 )
+
+replace github.com/apache/plc4x/plc4go => github.com/apiarytech/plc4x/plc4go v0.0.0-20261124025116-81fa346bff4f
